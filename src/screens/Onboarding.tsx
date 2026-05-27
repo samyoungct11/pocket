@@ -54,6 +54,12 @@ export function Onboarding() {
   const next = () => setStep((s) => s + 1)
   const prev = () => setStep((s) => Math.max(0, s - 1))
 
+  const handleKey = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && canContinue) {
+      step === steps.length - 1 ? finish() : next()
+    }
+  }
+
   const steps = [
     {
       title: "What's your name?",
@@ -63,8 +69,10 @@ export function Onboarding() {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          onKeyDown={handleKey}
           placeholder="Your first name"
-          autoFocus
+          enterKeyHint="next"
+          autoComplete="given-name"
           className="w-full h-16 px-4 bg-card-2 rounded-2xl text-2xl font-semibold text-ink placeholder:text-soft focus:outline-none focus:ring-2 focus:ring-ink/20 tracking-tight"
         />
       ),
@@ -102,8 +110,9 @@ export function Onboarding() {
               inputMode="decimal"
               value={income}
               onChange={(e) => setIncome(e.target.value)}
+              onKeyDown={handleKey}
               placeholder="600"
-              autoFocus
+              enterKeyHint="next"
               className="num display w-full h-16 pl-10 pr-3 bg-card-2 rounded-2xl text-3xl font-bold text-ink placeholder:text-soft focus:outline-none focus:ring-2 focus:ring-ink/20"
             />
           </div>
