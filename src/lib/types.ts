@@ -36,7 +36,9 @@ export interface Transaction {
   amount: number
   categoryId: string
   date: string // ISO
-  isManual: boolean
+  note?: string
+  isManual?: boolean
+  source?: 'manual' | 'plaid'  // 'plaid' = synced from bank
 }
 
 export type NotificationType =

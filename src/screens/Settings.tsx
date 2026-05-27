@@ -1,16 +1,20 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Banknote,
   Bell,
   ChevronRight,
   Lock,
+  RefreshCw,
   RotateCcw,
   Sparkles,
   Sun,
   UserPlus,
 } from 'lucide-react'
+import { usePlaidLink } from 'react-plaid-link'
+import { toast } from 'sonner'
 import { useAppStore } from '@/store/useAppStore'
+import { supabase, getOrCreateUserId } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Switch } from '@/components/ui/Switch'
 import { Segmented } from '@/components/ui/Segmented'
@@ -18,6 +22,7 @@ import { Sheet } from '@/components/ui/Sheet'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/Icon'
 import type { ThemeMode, ToneMode } from '@/lib/types'
+import type { PlaidTransaction } from '@/store/useAppStore'
 
 export function Settings() {
   const navigate = useNavigate()
@@ -29,11 +34,113 @@ export function Settings() {
     resetAll,
     loadDemo,
     categories,
+    plaidConnected,
+    plaidUserId,
+    setPlaidUserId,
+    importPlaidTransactions,
   } = useAppStore()
   const [parentSheet, setParentSheet] = useState(false)
   const [privacySheet, setPrivacySheet] = useState(false)
   const [bankSheet, setBankSheet] = useState(false)
   const [muted, setMuted] = useState<Record<string, boolean>>({})
+  const [linkToken, setLinkToken] = useState<string | null>(null)
+  const [linking, setLinking] = useState(false)
+  const [syncing, setSyncing] = useState(false)
+
+  // ── Plaid Link ──────────────────────────────────────────────────────────────
+
+  const onPlaidSuccess = useCallback(
+    async (publicToken: string, metadata: { institution?: { name?: string } }) => {
+      const userId = plaidUserId
+      if (!userId) return
+      try {
+        // Exchange public token for permanent access token (server-side)
+        await fetch('/api/exchange-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            public_token: publicToken,
+            institution_name: metadata.institution?.name ?? 'Unknown Bank',
+            userId,
+          }),
+        })
+
+        // Pull transactions immediately
+        await syncTransactions(userId)
+        toast.success('Bank connected! Transactions imported.')
+        setBankSheet(false)
+      } catch {
+        toast.error('Connection failed — please try again.')
+      }
+    },
+    [plaidUserId], // eslint-disable-line react-hooks/exhaustive-deps
+  )
+
+  const { open: openPlaidLink, ready: plaidReady } = usePlaidLink({
+    token: linkToken ?? '',
+    onSuccess: onPlaidSuccess,
+    onExit: () => setLinking(false),
+  })
+
+  async function handleConnectBank() {
+    if (!supabase) {
+      toast.error('Bank connection not configured yet.')
+      return
+    }
+    setLinking(true)
+    try {
+      const userId = await getOrCreateUserId()
+      if (!userId) throw new Error('Could not get user ID')
+      setPlaidUserId(userId)
+
+      const resp = await fetch('/api/create-link-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      })
+      const { link_token, error } = await resp.json() as { link_token?: string; error?: string }
+      if (error || !link_token) throw new Error(error ?? 'No link token')
+
+      setLinkToken(link_token)
+    } catch (err) {
+      console.error(err)
+      toast.error('Could not start bank connection.')
+      setLinking(false)
+    }
+  }
+
+  // Open Plaid Link as soon as token arrives and SDK is ready
+  useEffect(() => {
+    if (linkToken && plaidReady) {
+      setLinking(false)
+      openPlaidLink()
+    }
+  }, [linkToken, plaidReady, openPlaidLink])
+
+  async function syncTransactions(userId?: string) {
+    const uid = userId ?? plaidUserId
+    if (!uid) return
+    setSyncing(true)
+    try {
+      const resp = await fetch('/api/sync-transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: uid }),
+      })
+      const { transactions, error } = await resp.json() as { transactions?: PlaidTransaction[]; error?: string }
+      if (error) throw new Error(error)
+      if (transactions?.length) {
+        importPlaidTransactions(transactions)
+        toast.success(`${transactions.length} transactions synced`)
+      } else {
+        toast.info('No new transactions')
+      }
+    } catch {
+      toast.error('Sync failed — please try again.')
+    } finally {
+      setSyncing(false)
+    }
+  }
 
   const parentCode = String(Math.floor(100000 + Math.random() * 900000))
 
@@ -199,25 +306,49 @@ export function Settings() {
       </Sheet>
 
       <Sheet open={bankSheet} onOpenChange={setBankSheet} title="Connect a bank">
-        <div className="space-y-2">
-          <p className="text-[13px] text-soft mb-2">
-            We use Plaid to securely link your bank or card. Read-only, never your password.
+        <div className="space-y-4">
+          <p className="text-[13px] text-soft leading-relaxed">
+            We use Plaid to securely link your bank or card. Read-only access only — we never see your password.
           </p>
-          {['Chase', 'Bank of America', 'Wells Fargo', 'Capital One', 'Apple Card'].map(
-            (b) => (
-              <button
-                key={b}
-                type="button"
-                className="w-full flex items-center justify-between bg-card-2 rounded-xl px-4 py-3.5 tap"
+
+          {plaidConnected ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2.5 bg-card-2 rounded-xl px-4 py-3">
+                <div className="h-2 w-2 rounded-full bg-brand" />
+                <span className="text-[13px] font-medium">Bank connected</span>
+              </div>
+              <Button
+                variant="secondary"
+                size="lg"
+                disabled={syncing}
+                onClick={() => syncTransactions()}
               >
-                <span className="text-[14px] font-medium">{b}</span>
-                <ChevronRight size={15} strokeWidth={1.75} className="text-soft" />
-              </button>
-            ),
+                <RefreshCw size={15} strokeWidth={1.75} className={syncing ? 'animate-spin' : ''} />
+                {syncing ? 'Syncing…' : 'Sync now'}
+              </Button>
+              <Button
+                size="lg"
+                disabled={linking}
+                onClick={handleConnectBank}
+              >
+                <Banknote size={15} strokeWidth={1.75} />
+                {linking ? 'Opening Plaid…' : 'Add another account'}
+              </Button>
+            </div>
+          ) : (
+            <Button
+              size="lg"
+              disabled={linking}
+              onClick={handleConnectBank}
+            >
+              <Banknote size={15} strokeWidth={1.75} />
+              {linking ? 'Opening Plaid…' : 'Connect with Plaid'}
+            </Button>
           )}
-          <div className="text-[11px] text-soft text-center pt-3">
-            (Demo — no real bank will connect.)
-          </div>
+
+          <p className="text-[11px] text-soft text-center">
+            Bank-grade 256-bit encryption · Read-only · Disconnect anytime
+          </p>
         </div>
       </Sheet>
     </div>

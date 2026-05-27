@@ -39,6 +39,10 @@ export interface AppState {
   theme: ThemeMode
   hydrated: boolean
 
+  // Plaid / bank connection
+  plaidUserId: string | null
+  plaidConnected: boolean
+
   // user
   setUser: (u: User) => void
   updateUser: (patch: Partial<User>) => void
@@ -72,6 +76,20 @@ export interface AppState {
   completeOnboarding: (input: OnboardingInput) => void
   loadDemo: () => void
   resetAll: () => void
+
+  // Plaid
+  setPlaidUserId: (id: string) => void
+  importPlaidTransactions: (raw: PlaidTransaction[]) => void
+}
+
+/** Shape returned by /api/sync-transactions */
+export interface PlaidTransaction {
+  id: string
+  amount: number        // positive = money out (Plaid convention)
+  date: string          // 'YYYY-MM-DD'
+  merchant: string
+  category: string      // already mapped to Pocket category name
+  raw_category: string
 }
 
 export interface OnboardingInput {
@@ -93,6 +111,8 @@ const emptyState = () => ({
   goals: [] as SavingsGoal[],
   contributions: [] as Contribution[],
   challenges: [] as Challenge[],
+  plaidUserId: null as string | null,
+  plaidConnected: false,
 })
 
 /** Maya's pre-populated demo data. */
@@ -242,6 +262,55 @@ export const useAppStore = create<AppState>()(
         set({
           ...emptyState(),
           hydrated: true,
+        }),
+
+      setPlaidUserId: (id) => set({ plaidUserId: id, plaidConnected: true }),
+
+      importPlaidTransactions: (raw) =>
+        set((s) => {
+          // Build a lookup of our categories by name
+          const catByName = Object.fromEntries(s.categories.map((c) => [c.name, c]))
+
+          const incoming: Transaction[] = raw.map((r) => {
+            // Match Plaid category → one of user's actual categories; fall back to first
+            const cat = catByName[r.category] ?? s.categories[0]
+            return {
+              id: r.id,
+              amount: r.amount,
+              merchant: r.merchant,
+              categoryId: cat?.id ?? '',
+              date: new Date(r.date).toISOString(),
+              note: '',
+              source: 'plaid' as const,
+            }
+          })
+
+          // Merge: keep manual transactions, replace/add plaid ones
+          const existingIds = new Set(incoming.map((t) => t.id))
+          const manual = s.transactions.filter(
+            (t) => (t as { source?: string }).source !== 'plaid' || !existingIds.has(t.id),
+          )
+
+          const merged = [...incoming, ...manual].sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+          )
+
+          // Recalculate category spent amounts
+          const now = new Date()
+          const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+          const spentByCat: Record<string, number> = {}
+          for (const t of merged) {
+            if (t.date >= monthStart) {
+              spentByCat[t.categoryId] = (spentByCat[t.categoryId] ?? 0) + t.amount
+            }
+          }
+
+          const updatedCategories = s.categories.map((c) => ({
+            ...c,
+            spent: spentByCat[c.id] ?? c.spent,
+          }))
+
+          return { transactions: merged, categories: updatedCategories }
         }),
     }),
     {
