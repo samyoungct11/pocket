@@ -25,7 +25,7 @@ export function Home() {
   const budget = totalBudget(categories)
   const spent = totalSpentThisMonth(transactions, now)
   const remaining = Math.max(0, budget - spent)
-  const overall = spent / budget
+  const overall = budget > 0 ? spent / budget : 0
   const status = statusColor(overall)
   const week = spentThisWeek(transactions, now)
   const lastWeek = spentLastWeek(transactions, now)
@@ -144,15 +144,30 @@ export function Home() {
             View all
           </Link>
         </div>
-        <Card className="py-1 divide-y divide-line">
-          {recent.map((t) => (
-            <TransactionRow
-              key={t.id}
-              transaction={t}
-              category={categoryById[t.categoryId]}
-              onClick={() => navigate(`/transactions`)}
-            />
-          ))}
+        <Card className="py-1">
+          {recent.length === 0 ? (
+            <div className="text-center py-6">
+              <div className="text-2xl mb-1">📝</div>
+              <div className="text-sm text-soft">
+                No spending yet — tap{' '}
+                <Link to="/transactions" className="text-brand font-medium">
+                  Activity
+                </Link>{' '}
+                to log your first one.
+              </div>
+            </div>
+          ) : (
+            <div className="divide-y divide-line">
+              {recent.map((t) => (
+                <TransactionRow
+                  key={t.id}
+                  transaction={t}
+                  category={categoryById[t.categoryId]}
+                  onClick={() => navigate(`/transactions`)}
+                />
+              ))}
+            </div>
+          )}
         </Card>
       </section>
     </div>

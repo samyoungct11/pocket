@@ -4,6 +4,10 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { useAppStore } from '@/store/useAppStore'
 import { Button } from '@/components/ui/Button'
+import {
+  CATEGORY_DEFAULTS,
+  ONBOARDING_CATEGORIES,
+} from '@/lib/onboardingDefaults'
 import type { AgeRange, PrimaryGoal, ToneMode } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -15,44 +19,30 @@ const AGES: { value: AgeRange; label: string }[] = [
 ]
 
 const GOALS: { value: PrimaryGoal; label: string; emoji: string }[] = [
-  { value: 'spend_less', label: 'Spend less', emoji: '💸' },
-  { value: 'save_for_goal', label: 'Save for something', emoji: '🎯' },
-  { value: 'stop_impulse', label: 'Stop impulse shopping', emoji: '🛑' },
-  { value: 'track_food', label: 'Track food spending', emoji: '🍔' },
-  { value: 'stay_under', label: 'Stay under budget', emoji: '📊' },
-  { value: 'build_habits', label: 'Build better habits', emoji: '🌱' },
-]
-
-const CATS = [
-  'Restaurants',
-  'Coffee',
-  'Shopping',
-  'Fun',
-  'Subscriptions',
-  'Transport',
-  'Beauty',
-  'Gaming',
-  'School',
-  'Sports',
-  'Gifts',
-  'Other',
+  { value: 'spend_less',    label: 'Spend less',             emoji: '💸' },
+  { value: 'save_for_goal', label: 'Save for something',     emoji: '🎯' },
+  { value: 'stop_impulse',  label: 'Stop impulse shopping',  emoji: '🛑' },
+  { value: 'track_food',    label: 'Track food spending',    emoji: '🍔' },
+  { value: 'stay_under',    label: 'Stay under budget',      emoji: '📊' },
+  { value: 'build_habits',  label: 'Build better habits',    emoji: '🌱' },
 ]
 
 const TONES: { value: ToneMode; label: string; emoji: string; body: string }[] = [
-  { value: 'strict', label: 'Strict', emoji: '🎯', body: 'Ping me early, ping me often.' },
+  { value: 'strict',   label: 'Strict',   emoji: '🎯', body: 'Ping me early, ping me often.' },
   { value: 'balanced', label: 'Balanced', emoji: '⚖️', body: 'Tell me when it matters.' },
-  { value: 'chill', label: 'Chill', emoji: '🌊', body: 'Just the big stuff.' },
+  { value: 'chill',    label: 'Chill',    emoji: '🌊', body: 'Just the big stuff.' },
 ]
 
 export function Onboarding() {
   const navigate = useNavigate()
-  const { updateUser } = useAppStore()
+  const { completeOnboarding, loadDemo, user } = useAppStore()
   const [step, setStep] = useState(0)
+  const [name, setName] = useState('')
   const [age, setAge] = useState<AgeRange>('18-22')
-  const [income, setIncome] = useState('600')
+  const [income, setIncome] = useState('')
   const [student, setStudent] = useState<'yes' | 'no' | 'sometimes'>('yes')
-  const [goal, setGoal] = useState<PrimaryGoal>('track_food')
-  const [picked, setPicked] = useState<string[]>(['Restaurants', 'Coffee', 'Shopping', 'Fun'])
+  const [goal, setGoal] = useState<PrimaryGoal>('stay_under')
+  const [picked, setPicked] = useState<string[]>([])
   const [tone, setTone] = useState<ToneMode>('balanced')
   const [done, setDone] = useState(false)
 
@@ -63,25 +53,21 @@ export function Onboarding() {
   const next = () => setStep((s) => s + 1)
   const prev = () => setStep((s) => Math.max(0, s - 1))
 
-  const canContinue = useMemo(() => {
-    if (step === 1 && (!income || parseFloat(income) <= 0)) return false
-    if (step === 4 && picked.length < 3) return false
-    return true
-  }, [step, income, picked])
-
-  const finish = () => {
-    updateUser({
-      ageRange: age,
-      monthlyIncome: parseFloat(income),
-      isStudent: student === 'yes',
-      primaryGoal: goal,
-      notificationTone: tone,
-    })
-    setDone(true)
-    setTimeout(() => navigate('/'), 1400)
-  }
-
   const steps = [
+    {
+      title: "Hey 👋 what's your name?",
+      sub: 'We use this to make things feel like yours.',
+      content: (
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Your first name"
+          autoFocus
+          className="w-full h-16 px-4 bg-card-2 rounded-2xl text-2xl font-semibold text-ink placeholder:text-soft focus:outline-none focus:ring-2 focus:ring-brand"
+        />
+      ),
+    },
     {
       title: 'How old are you?',
       sub: 'We tune the experience to your life stage.',
@@ -103,15 +89,21 @@ export function Onboarding() {
       sub: 'Allowance, job, parents — anything counts.',
       content: (
         <div>
-          <div className="text-xs text-soft uppercase tracking-wide mb-1">Per month</div>
+          <div className="text-xs text-soft uppercase tracking-wide mb-1">
+            Per month
+          </div>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-2xl text-soft">$</span>
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-2xl text-soft">
+              $
+            </span>
             <input
               type="number"
               inputMode="decimal"
               value={income}
               onChange={(e) => setIncome(e.target.value)}
-              className="num w-full h-16 pl-9 pr-3 bg-card-2 rounded-2xl text-3xl font-semibold focus:outline-none focus:ring-2 focus:ring-brand"
+              placeholder="600"
+              autoFocus
+              className="num w-full h-16 pl-10 pr-3 bg-card-2 rounded-2xl text-3xl font-semibold text-ink placeholder:text-soft focus:outline-none focus:ring-2 focus:ring-brand"
             />
           </div>
         </div>
@@ -135,7 +127,7 @@ export function Onboarding() {
       ),
     },
     {
-      title: 'What\'s your main goal?',
+      title: "What's your main goal?",
       sub: 'Pick one. You can change it anytime.',
       content: (
         <div className="space-y-2">
@@ -157,15 +149,26 @@ export function Onboarding() {
       sub: `Pick at least 3. (${picked.length} selected)`,
       content: (
         <div className="grid grid-cols-3 gap-2">
-          {CATS.map((c) => (
-            <PickerCard
-              key={c}
-              active={picked.includes(c)}
-              onClick={() => togglePick(c)}
-              label={c}
-              variant="chip"
-            />
-          ))}
+          {ONBOARDING_CATEGORIES.map((c) => {
+            const def = CATEGORY_DEFAULTS[c]
+            const active = picked.includes(c)
+            return (
+              <button
+                key={c}
+                type="button"
+                onClick={() => togglePick(c)}
+                className={cn(
+                  'h-20 rounded-2xl border tap flex flex-col items-center justify-center gap-1',
+                  active
+                    ? 'bg-brand-soft border-brand text-[var(--color-brand-strong)]'
+                    : 'bg-card border-line text-ink',
+                )}
+              >
+                <span className="text-2xl">{def?.emoji}</span>
+                <span className="text-xs font-semibold">{c}</span>
+              </button>
+            )
+          })}
         </div>
       ),
     },
@@ -197,9 +200,30 @@ export function Onboarding() {
     },
   ]
 
+  const canContinue = useMemo(() => {
+    if (step === 0) return name.trim().length > 0
+    if (step === 2) return !!income && parseFloat(income) > 0
+    if (step === 5) return picked.length >= 3
+    return true
+  }, [step, name, income, picked])
+
+  const finish = () => {
+    completeOnboarding({
+      name: name.trim(),
+      ageRange: age,
+      monthlyIncome: parseFloat(income) || 0,
+      isStudent: student === 'yes',
+      primaryGoal: goal,
+      notificationTone: tone,
+      categories: picked,
+    })
+    setDone(true)
+    setTimeout(() => navigate('/', { replace: true }), 1100)
+  }
+
   if (done) {
     return (
-      <div className="min-h-screen md:min-h-[844px] flex flex-col items-center justify-center text-center px-6">
+      <div className="h-full flex flex-col items-center justify-center text-center px-6">
         <motion.div
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -208,20 +232,28 @@ export function Onboarding() {
         >
           <Check size={40} strokeWidth={3} />
         </motion.div>
-        <h1 className="text-2xl font-semibold">You're set.</h1>
+        <h1 className="text-2xl font-semibold">You're set, {name.trim() || 'friend'}.</h1>
         <p className="text-sm text-soft mt-1">Loading your dashboard…</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen md:min-h-[844px] flex flex-col px-5 pt-4 pb-6">
+    <div className="h-full flex flex-col px-5 pt-5 pb-6">
       {/* Top bar */}
       <div className="flex items-center gap-2">
         <button
           type="button"
-          onClick={step === 0 ? () => navigate('/') : prev}
-          className="h-10 w-10 rounded-full bg-card border border-line flex items-center justify-center tap"
+          onClick={
+            step === 0
+              ? () => (user ? navigate(-1) : null)
+              : prev
+          }
+          className={cn(
+            'h-10 w-10 rounded-full bg-card border border-line flex items-center justify-center tap',
+            step === 0 && !user && 'invisible',
+          )}
+          aria-label="Back"
         >
           <ArrowLeft size={18} />
         </button>
@@ -239,7 +271,7 @@ export function Onboarding() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex flex-col mt-6">
+      <div className="flex-1 flex flex-col mt-6 min-h-0">
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
@@ -247,27 +279,42 @@ export function Onboarding() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -16 }}
             transition={{ duration: 0.2 }}
-            className="flex-1"
+            className="flex-1 overflow-y-auto"
           >
-            <h1 className="text-[26px] font-semibold tracking-tight">
+            <h1 className="text-[26px] font-semibold tracking-tight leading-tight">
               {steps[step].title}
             </h1>
             {steps[step].sub && (
-              <p className="text-sm text-soft mt-1">{steps[step].sub}</p>
+              <p className="text-sm text-soft mt-1.5">{steps[step].sub}</p>
             )}
-            <div className="mt-6">{steps[step].content}</div>
+            <div className="mt-6 pb-4">{steps[step].content}</div>
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <Button
-        size="lg"
-        disabled={!canContinue}
-        onClick={step === steps.length - 1 ? finish : next}
-      >
-        {step === steps.length - 1 ? "Let's go" : 'Continue'}
-        <ArrowRight size={18} />
-      </Button>
+      {/* Bottom action */}
+      <div className="pt-3 space-y-2">
+        <Button
+          size="lg"
+          disabled={!canContinue}
+          onClick={step === steps.length - 1 ? finish : next}
+        >
+          {step === steps.length - 1 ? "Let's go" : 'Continue'}
+          <ArrowRight size={18} />
+        </Button>
+        {step === 0 && !user && (
+          <button
+            type="button"
+            onClick={() => {
+              loadDemo()
+              navigate('/', { replace: true })
+            }}
+            className="w-full text-xs text-soft py-2 tap"
+          >
+            Or skip — try the demo (Maya's account)
+          </button>
+        )}
+      </div>
     </div>
   )
 }
@@ -283,24 +330,8 @@ function PickerCard({
   onClick: () => void
   label: string
   emoji?: string
-  variant?: 'card' | 'row' | 'chip'
+  variant?: 'card' | 'row'
 }) {
-  if (variant === 'chip') {
-    return (
-      <button
-        type="button"
-        onClick={onClick}
-        className={cn(
-          'h-12 rounded-xl text-sm font-medium tap border',
-          active
-            ? 'bg-brand-soft border-brand text-[var(--color-brand-strong)]'
-            : 'bg-card border-line text-ink',
-        )}
-      >
-        {label}
-      </button>
-    )
-  }
   if (variant === 'row') {
     return (
       <button

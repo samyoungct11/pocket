@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AppShell } from '@/layouts/AppShell'
 import { NavLayout } from '@/layouts/NavLayout'
+import { FullScreenLayout } from '@/layouts/FullScreenLayout'
 import { Home } from '@/screens/Home'
 import { Transactions } from '@/screens/Transactions'
 import { Coach } from '@/screens/Coach'
@@ -17,6 +18,7 @@ export function Router() {
     <BrowserRouter>
       <Routes>
         <Route element={<AppShell />}>
+          {/* Tab-bar routes (scroll handled inside NavLayout's main) */}
           <Route element={<NavLayout />}>
             <Route path="/" element={<Home />} />
             <Route path="/transactions" element={<Transactions />} />
@@ -24,9 +26,15 @@ export function Router() {
             <Route path="/goals" element={<Goals />} />
             <Route path="/settings" element={<Settings />} />
           </Route>
-          <Route path="/category/:id" element={<CategoryDetail />} />
+
+          {/* Simple scrollable pages */}
+          <Route element={<FullScreenLayout />}>
+            <Route path="/category/:id" element={<CategoryDetail />} />
+            <Route path="/inbox" element={<Inbox />} />
+          </Route>
+
+          {/* Self-managed full-bleed screens */}
           <Route path="/check" element={<AffordCheck />} />
-          <Route path="/inbox" element={<Inbox />} />
           <Route path="/weekly" element={<WeeklySummary />} />
           <Route path="/welcome" element={<Onboarding />} />
         </Route>

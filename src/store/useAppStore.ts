@@ -1,12 +1,15 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type {
+  AgeRange,
   Category,
   Challenge,
   Contribution,
   NotificationItem,
+  PrimaryGoal,
   SavingsGoal,
   ThemeMode,
+  ToneMode,
   Transaction,
   User,
 } from '@/lib/types'
@@ -19,6 +22,10 @@ import {
   seedTransactions,
   seedUser,
 } from '@/lib/seed'
+import {
+  buildWelcomeNotification,
+  generateCategories,
+} from '@/lib/onboardingDefaults'
 
 export interface AppState {
   user: User | null
@@ -56,13 +63,39 @@ export interface AppState {
   // challenges
   toggleChallenge: (id: string) => void
 
-  // theme + demo
+  // theme + lifecycle
   setTheme: (t: ThemeMode) => void
-  resetDemo: () => void
   setHydrated: (v: boolean) => void
+
+  // onboarding / demo
+  completeOnboarding: (input: OnboardingInput) => void
+  loadDemo: () => void
+  resetAll: () => void
 }
 
-const initialDemo = () => ({
+export interface OnboardingInput {
+  name: string
+  ageRange: AgeRange
+  monthlyIncome: number
+  isStudent: boolean
+  primaryGoal: PrimaryGoal
+  categories: string[]
+  notificationTone: ToneMode
+}
+
+/** Truly empty state — no user, no data. App routes to /welcome from here. */
+const emptyState = () => ({
+  user: null as User | null,
+  categories: [] as Category[],
+  transactions: [] as Transaction[],
+  notifications: [] as NotificationItem[],
+  goals: [] as SavingsGoal[],
+  contributions: [] as Contribution[],
+  challenges: [] as Challenge[],
+})
+
+/** Maya's pre-populated demo data. */
+const demoState = () => ({
   user: seedUser,
   categories: seedCategories,
   transactions: seedTransactions,
@@ -75,7 +108,7 @@ const initialDemo = () => ({
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      ...initialDemo(),
+      ...emptyState(),
       theme: 'system' as ThemeMode,
       hydrated: false,
 
@@ -86,7 +119,7 @@ export const useAppStore = create<AppState>()(
       setCategoryBudget: (id, budget) =>
         set((s) => ({
           categories: s.categories.map((c) =>
-            c.id === id ? { ...c, monthlyBudget: budget } : c
+            c.id === id ? { ...c, monthlyBudget: budget } : c,
           ),
         })),
       upsertCategory: (c) =>
@@ -104,7 +137,7 @@ export const useAppStore = create<AppState>()(
       updateTransaction: (id, patch) =>
         set((s) => ({
           transactions: s.transactions.map((t) =>
-            t.id === id ? { ...t, ...patch } : t
+            t.id === id ? { ...t, ...patch } : t,
           ),
         })),
       removeTransaction: (id) =>
@@ -115,7 +148,7 @@ export const useAppStore = create<AppState>()(
       markNotificationRead: (id) =>
         set((s) => ({
           notifications: s.notifications.map((n) =>
-            n.id === id ? { ...n, read: true } : n
+            n.id === id ? { ...n, read: true } : n,
           ),
         })),
       markAllRead: () =>
@@ -138,14 +171,16 @@ export const useAppStore = create<AppState>()(
           goals: s.goals.map((g) =>
             g.id === goalId
               ? { ...g, currentAmount: g.currentAmount + amount }
-              : g
+              : g,
           ),
         })),
       upsertGoal: (g) =>
         set((s) => {
           const exists = s.goals.some((x) => x.id === g.id)
           return {
-            goals: exists ? s.goals.map((x) => (x.id === g.id ? g : x)) : [...s.goals, g],
+            goals: exists
+              ? s.goals.map((x) => (x.id === g.id ? g : x))
+              : [...s.goals, g],
           }
         }),
 
@@ -153,21 +188,67 @@ export const useAppStore = create<AppState>()(
         set((s) => ({
           challenges: s.challenges.map((c) =>
             c.id === id
-              ? { ...c, active: !c.active, startedAt: !c.active ? new Date().toISOString() : c.startedAt }
-              : c
+              ? {
+                  ...c,
+                  active: !c.active,
+                  startedAt: !c.active
+                    ? new Date().toISOString()
+                    : c.startedAt,
+                }
+              : c,
           ),
         })),
 
       setTheme: (t) => set({ theme: t }),
       setHydrated: (v) => set({ hydrated: v }),
-      resetDemo: () =>
-        set({ ...initialDemo(), theme: 'system' as ThemeMode, hydrated: true }),
+
+      completeOnboarding: (input) => {
+        const categories = generateCategories(input.categories, input.monthlyIncome)
+        const totalBudget = categories.reduce((s, c) => s + c.monthlyBudget, 0)
+        const user: User = {
+          id: crypto.randomUUID(),
+          name: input.name || 'You',
+          ageRange: input.ageRange,
+          monthlyIncome: input.monthlyIncome,
+          isStudent: input.isStudent,
+          primaryGoal: input.primaryGoal,
+          notificationTone: input.notificationTone,
+          createdAt: new Date().toISOString(),
+        }
+        set({
+          ...emptyState(),
+          user,
+          categories,
+          notifications: [buildWelcomeNotification(totalBudget)],
+          challenges: [
+            {
+              id: 'ch-starter',
+              title: 'Log your first 3 spends',
+              description: 'Get a feel for how the coach reacts.',
+              active: false,
+            },
+          ],
+        })
+      },
+
+      loadDemo: () =>
+        set({
+          ...demoState(),
+          hydrated: true,
+        }),
+
+      resetAll: () =>
+        set({
+          ...emptyState(),
+          hydrated: true,
+        }),
     }),
     {
-      name: 'pocket-store-v1',
+      // bumped key — clears any old Maya-seeded state from v1
+      name: 'pocket-store-v2',
       onRehydrateStorage: () => (state) => {
         state?.setHydrated(true)
       },
-    }
-  )
+    },
+  ),
 )

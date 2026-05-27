@@ -6,6 +6,7 @@ import {
   ChevronRight,
   Lock,
   RotateCcw,
+  Sparkles,
   Sun,
   UserPlus,
 } from 'lucide-react'
@@ -24,7 +25,8 @@ export function Settings() {
     theme,
     setTheme,
     updateUser,
-    resetDemo,
+    resetAll,
+    loadDemo,
     categories,
   } = useAppStore()
   const [parentSheet, setParentSheet] = useState(false)
@@ -142,26 +144,30 @@ export function Settings() {
         onClick={() => setPrivacySheet(true)}
       />
 
-      {/* Demo reset */}
+      {/* Demo + reset */}
       <SettingsRow
-        icon={<RotateCcw size={18} />}
-        label="Reset demo data"
-        sublabel="Start fresh with Maya's data"
+        icon={<Sparkles size={18} />}
+        label="Load demo data"
+        sublabel="See the app with Maya's pre-filled account"
         onClick={() => {
-          if (confirm('Reset to demo data? This wipes any added transactions.')) {
-            resetDemo()
+          if (confirm("Replace your data with Maya's demo account?")) {
+            loadDemo()
             navigate('/')
           }
         }}
       />
 
-      <button
-        type="button"
-        onClick={() => navigate('/welcome')}
-        className="w-full text-center text-sm text-soft py-3"
-      >
-        Run onboarding again
-      </button>
+      <SettingsRow
+        icon={<RotateCcw size={18} />}
+        label="Start over"
+        sublabel="Wipe everything and redo onboarding"
+        onClick={() => {
+          if (confirm('Wipe all your data and start onboarding again?')) {
+            resetAll()
+            navigate('/welcome', { replace: true })
+          }
+        }}
+      />
 
       {/* Sheets */}
       <Sheet open={parentSheet} onOpenChange={setParentSheet} title="Invite a parent">

@@ -113,7 +113,7 @@ export function AffordCheck() {
   }, [verdict])
 
   return (
-    <div className="flex flex-col min-h-screen md:min-h-[844px] px-5 pt-4 pb-6">
+    <div className="flex flex-col h-full px-5 pt-4 pb-6">
       <header className="flex items-center gap-3">
         <button
           type="button"

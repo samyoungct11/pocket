@@ -69,7 +69,6 @@
   button {
     font-family: inherit;
   }
-  /* tabular money */
   .num {
     font-variant-numeric: tabular-nums;
   }
@@ -86,11 +85,9 @@
   .divide-line > * + * { border-color: var(--line); }
 }
 
-/* Hide scrollbars on horizontal scrollers used in mobile UI */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Subtle tap feedback */
 @media (hover: none) {
   .tap:active { transform: scale(0.97); transition: transform 0.1s; }
 }
