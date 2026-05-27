@@ -9,7 +9,7 @@ import {
   totalBudget,
   totalSpentThisMonth,
 } from '@/lib/selectors'
-import { cn, money } from '@/lib/utils'
+import { cn, money, uid } from '@/lib/utils'
 import { logTransaction } from '@/lib/notify'
 import type { Transaction } from '@/lib/types'
 
@@ -233,7 +233,7 @@ export function AffordCheck() {
                   size="md"
                   onClick={() => {
                     const txn: Transaction = {
-                      id: crypto.randomUUID(),
+                      id: uid(),
                       merchant: 'Manual entry',
                       amount: value,
                       categoryId,

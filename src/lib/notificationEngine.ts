@@ -2,6 +2,7 @@ import { differenceInHours, endOfMonth, isAfter, startOfMonth, subDays, subWeeks
 import type { AppState } from '@/store/useAppStore'
 import { getNotificationCopy } from '@/lib/notificationCopy'
 import type { NotificationItem, NotificationType, Transaction } from '@/lib/types'
+import { uid } from '@/lib/utils'
 
 /**
  * Evaluate a freshly-added transaction. Returns the highest-priority
@@ -138,7 +139,7 @@ function build(
 ): NotificationItem {
   const copy = getNotificationCopy(type, ctx, tone)
   return {
-    id: crypto.randomUUID(),
+    id: uid(),
     type,
     title: copy.title,
     body: copy.body,

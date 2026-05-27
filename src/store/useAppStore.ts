@@ -26,6 +26,7 @@ import {
   buildWelcomeNotification,
   generateCategories,
 } from '@/lib/onboardingDefaults'
+import { uid } from '@/lib/utils'
 
 export interface AppState {
   user: User | null
@@ -160,7 +161,7 @@ export const useAppStore = create<AppState>()(
         set((s) => ({
           contributions: [
             {
-              id: crypto.randomUUID(),
+              id: uid(),
               goalId,
               amount,
               date: new Date().toISOString(),
@@ -206,7 +207,7 @@ export const useAppStore = create<AppState>()(
         const categories = generateCategories(input.categories, input.monthlyIncome)
         const totalBudget = categories.reduce((s, c) => s + c.monthlyBudget, 0)
         const user: User = {
-          id: crypto.randomUUID(),
+          id: uid(),
           name: input.name || 'You',
           ageRange: input.ageRange,
           monthlyIncome: input.monthlyIncome,

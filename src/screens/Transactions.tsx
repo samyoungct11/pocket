@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/Card'
 import { Sheet } from '@/components/ui/Sheet'
 import { Button } from '@/components/ui/Button'
 import { groupTransactionsByDate } from '@/lib/selectors'
+import { uid } from '@/lib/utils'
 import { logTransaction } from '@/lib/notify'
 import type { Transaction } from '@/lib/types'
 
@@ -131,7 +132,7 @@ function AddTransactionSheet({
     const value = parseFloat(amount)
     if (!Number.isFinite(value) || value <= 0 || !merchant.trim() || !categoryId) return
     const txn: Transaction = {
-      id: crypto.randomUUID(),
+      id: uid(),
       merchant: merchant.trim(),
       amount: value,
       categoryId,

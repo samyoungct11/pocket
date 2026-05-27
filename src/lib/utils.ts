@@ -33,3 +33,19 @@ export function statusColor(pct: number): 'green' | 'amber' | 'red' {
   if (pct >= 0.7) return 'amber'
   return 'green'
 }
+
+/**
+ * Generate a unique ID. Uses crypto.randomUUID() in secure contexts
+ * (HTTPS or localhost), falls back to a timestamp+random string otherwise
+ * (e.g. when accessing the dev server via LAN IP over plain HTTP).
+ */
+export function uid(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    try {
+      return crypto.randomUUID()
+    } catch {
+      // some browsers throw outside secure context
+    }
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 11)}`
+}

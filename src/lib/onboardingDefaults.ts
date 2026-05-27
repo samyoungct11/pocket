@@ -1,4 +1,5 @@
 import type { Category, NotificationItem } from '@/lib/types'
+import { uid } from '@/lib/utils'
 
 /** Default weights + icons for the 12 onboarding category choices. */
 export const CATEGORY_DEFAULTS: Record<
@@ -44,7 +45,7 @@ export function generateCategories(
     const raw = totalWeight > 0 ? (def.weight / totalWeight) * spendable : 0
     const budget = Math.max(10, Math.round(raw / 5) * 5)
     return {
-      id: crypto.randomUUID(),
+      id: uid(),
       name,
       icon: def.icon,
       emoji: def.emoji,
@@ -56,7 +57,7 @@ export function generateCategories(
 /** A welcoming first notification so the inbox isn't empty. */
 export function buildWelcomeNotification(totalBudget: number): NotificationItem {
   return {
-    id: crypto.randomUUID(),
+    id: uid(),
     type: 'monthly_reset',
     title: 'Welcome to Pocket',
     body: `$${totalBudget} budgeted across your categories. Tap + on Activity to log your first spend.`,
