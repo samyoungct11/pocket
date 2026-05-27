@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Sheet } from '@/components/ui/Sheet'
 import { ProgressRing } from '@/components/ProgressRing'
+import { Icon } from '@/components/Icon'
 import { money } from '@/lib/utils'
 
 export function Goals() {
@@ -16,10 +17,19 @@ export function Goals() {
   const goal = goals[0]
   if (!goal) {
     return (
-      <div className="p-5">
+      <div className="px-5 pt-5">
+        <h1 className="text-[26px] font-semibold tracking-tight mb-4">Goals</h1>
         <Card className="text-center py-10">
-          <div className="text-3xl mb-2">🎯</div>
-          <div className="text-[15px] font-semibold">No goal yet</div>
+          <div className="h-12 w-12 rounded-2xl bg-card-2 text-ink flex items-center justify-center mx-auto mb-3">
+            <Icon name="Target" size={20} />
+          </div>
+          <div className="text-[15px] font-semibold tracking-tight">No goal yet</div>
+          <div className="text-[13px] text-soft mt-1">
+            Create one to start tracking progress.
+          </div>
+          <Button size="md" className="mt-4 mx-auto w-auto">
+            Create a goal
+          </Button>
         </Card>
       </div>
     )
@@ -45,52 +55,58 @@ export function Goals() {
   }
 
   return (
-    <div className="px-5 pt-4 pb-6 space-y-4">
+    <div className="px-5 pt-5 pb-8 space-y-4">
       <header>
-        <h1 className="text-[22px] font-semibold tracking-tight">Goals</h1>
+        <h1 className="text-[26px] font-semibold tracking-tight">Goals</h1>
       </header>
 
-      {/* Hero */}
       <Card className="text-center py-8 flex flex-col items-center">
-        <div className="text-5xl mb-3">{goal.emoji}</div>
-        <ProgressRing value={pct} size={180} stroke={12}>
+        <div className="h-14 w-14 rounded-2xl bg-card-2 text-ink flex items-center justify-center mb-4">
+          <Icon name={goal.icon} size={26} strokeWidth={1.75} />
+        </div>
+        <ProgressRing value={pct} size={180} stroke={9}>
           <div className="text-center">
-            <div className="num text-[28px] font-semibold leading-none">
+            <div className="num display text-[30px] font-bold">
               {money(goal.currentAmount)}
             </div>
-            <div className="text-xs text-soft mt-1.5">of {money(goal.targetAmount)}</div>
+            <div className="text-[12px] text-soft mt-2 num">
+              of {money(goal.targetAmount)}
+            </div>
           </div>
         </ProgressRing>
-        <div className="mt-4 text-[15px] font-semibold">{goal.name}</div>
-        <div className="text-sm text-soft mt-1">
+        <div className="mt-5 text-[15px] font-semibold tracking-tight">{goal.name}</div>
+        <div className="text-[12px] text-soft mt-1 num">
           {money(remaining)} to go
           {monthsToFinish !== null &&
             monthsToFinish > 0 &&
             ` · ~${monthsToFinish} months at your pace`}
         </div>
         <Button size="md" className="mt-4 w-auto" onClick={() => setAddOpen(true)}>
-          <Plus size={16} />
+          <Plus size={15} strokeWidth={1.75} />
           Add funds
         </Button>
       </Card>
 
-      {/* History */}
       <section>
-        <h2 className="text-[15px] font-semibold mb-2">Contributions</h2>
+        <h2 className="text-[13px] font-semibold tracking-tight uppercase text-soft mb-2 mt-2">
+          Contributions
+        </h2>
         <Card className="py-1">
           {goalContribs.length === 0 && (
-            <div className="text-center text-sm text-soft py-4">No contributions yet</div>
+            <div className="text-center text-[13px] text-soft py-4">
+              No contributions yet
+            </div>
           )}
           <ul className="divide-y divide-line">
             {goalContribs.map((c) => (
               <li key={c.id} className="flex items-center justify-between py-3">
                 <div>
-                  <div className="text-sm font-medium">{c.note ?? 'Added'}</div>
-                  <div className="text-xs text-soft">
+                  <div className="text-[13px] font-semibold">{c.note ?? 'Added'}</div>
+                  <div className="text-[11px] text-soft">
                     {format(new Date(c.date), 'MMM d, yyyy')}
                   </div>
                 </div>
-                <div className="num text-[15px] font-semibold text-[var(--color-brand-strong)]">
+                <div className="num text-[14px] font-semibold text-[var(--color-brand-strong)]">
                   +{money(c.amount)}
                 </div>
               </li>
@@ -106,10 +122,10 @@ export function Goals() {
       <Sheet open={addOpen} onOpenChange={setAddOpen} title="Add funds">
         <div className="space-y-3">
           <div>
-            <label className="text-xs text-soft font-medium uppercase tracking-wide">
+            <label className="text-[11px] text-soft uppercase tracking-[0.16em] font-semibold">
               Amount
             </label>
-            <div className="relative mt-1">
+            <div className="relative mt-2">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-soft">
                 $
               </span>
@@ -119,7 +135,7 @@ export function Goals() {
                 value={addAmount}
                 onChange={(e) => setAddAmount(e.target.value)}
                 placeholder="20"
-                className="num w-full h-12 pl-7 pr-3 bg-card-2 rounded-xl text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-brand"
+                className="num w-full h-12 pl-7 pr-3 bg-card-2 rounded-xl text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-ink/20"
               />
             </div>
           </div>

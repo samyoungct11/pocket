@@ -1,24 +1,25 @@
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, CheckCheck } from 'lucide-react'
 import { format } from 'date-fns'
+import { Icon } from '@/components/Icon'
 import { useAppStore } from '@/store/useAppStore'
 import { Card } from '@/components/ui/Card'
 import type { NotificationItem, NotificationType } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
-const TYPE_EMOJI: Record<NotificationType, string> = {
-  safe: '✅',
-  approaching: '👀',
-  at_limit: '⚠️',
-  over: '🛑',
-  pattern: '🔁',
-  trend: '📈',
-  positive: '🎉',
-  no_spend: '🔥',
-  impulse: '💡',
-  weekly_summary: '📊',
-  monthly_reset: '🗓️',
-  savings_milestone: '🌴',
+const TYPE_ICON: Record<NotificationType, string> = {
+  safe: 'Check',
+  approaching: 'AlertCircle',
+  at_limit: 'AlertTriangle',
+  over: 'XCircle',
+  pattern: 'Repeat',
+  trend: 'TrendingUp',
+  positive: 'Sparkles',
+  no_spend: 'Flame',
+  impulse: 'Zap',
+  weekly_summary: 'BarChart3',
+  monthly_reset: 'Calendar',
+  savings_milestone: 'Target',
 }
 
 const TYPE_TINT: Record<NotificationType, string> = {
@@ -44,14 +45,14 @@ export function Inbox() {
 
   return (
     <div className="pb-8">
-      <header className="px-5 pt-4 flex items-center justify-between">
+      <header className="px-5 pt-5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="h-10 w-10 rounded-full bg-card border border-line flex items-center justify-center tap"
+            className="h-10 w-10 rounded-full bg-card flex items-center justify-center tap shadow-[var(--shadow-card)]"
           >
-            <ArrowLeft size={18} />
+            <ArrowLeft size={17} strokeWidth={1.75} />
           </button>
           <h1 className="text-[18px] font-semibold tracking-tight">Updates</h1>
         </div>
@@ -59,18 +60,17 @@ export function Inbox() {
           <button
             type="button"
             onClick={markAllRead}
-            className="text-xs text-brand font-medium inline-flex items-center gap-1 tap"
+            className="text-[12px] text-ink font-semibold inline-flex items-center gap-1 tap"
           >
-            <CheckCheck size={14} />
+            <CheckCheck size={14} strokeWidth={1.75} />
             Mark all read
           </button>
         )}
       </header>
 
-      <div className="px-5 mt-5 space-y-4">
+      <div className="px-5 mt-5 space-y-5">
         {grouped.length === 0 && (
           <Card className="text-center py-10">
-            <div className="text-3xl mb-2">🔕</div>
             <div className="text-[15px] font-semibold">All caught up</div>
             <div className="text-sm text-soft mt-1">
               You'll see spending updates here.
@@ -80,7 +80,7 @@ export function Inbox() {
 
         {grouped.map((g) => (
           <section key={g.label}>
-            <div className="text-[11px] text-soft uppercase tracking-wide font-semibold px-1 mb-1.5">
+            <div className="text-[11px] text-soft uppercase tracking-[0.16em] font-semibold px-1 mb-2">
               {g.label}
             </div>
             <div className="space-y-2">
@@ -90,32 +90,33 @@ export function Inbox() {
                   type="button"
                   onClick={() => markNotificationRead(n.id)}
                   className={cn(
-                    'w-full text-left bg-card border border-line rounded-2xl p-4 tap flex gap-3 items-start',
-                    !n.read && 'border-l-4',
+                    'w-full text-left bg-card rounded-[20px] p-4 tap flex gap-3 items-start shadow-[var(--shadow-card)] dark:ring-1 dark:ring-[var(--line)]',
                   )}
-                  style={!n.read ? { borderLeftColor: 'var(--color-brand)' } : undefined}
                 >
                   <div
                     className={cn(
-                      'h-10 w-10 rounded-xl flex items-center justify-center text-base shrink-0',
+                      'h-9 w-9 rounded-xl flex items-center justify-center shrink-0',
                       TYPE_TINT[n.type],
                     )}
                   >
-                    {TYPE_EMOJI[n.type]}
+                    <Icon name={TYPE_ICON[n.type]} size={16} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <div className="text-[14px] font-semibold truncate">
+                      <div className="text-[14px] font-semibold truncate tracking-tight">
                         {n.title}
                       </div>
-                      <div className="text-[11px] text-soft shrink-0">
+                      <div className="text-[11px] text-soft shrink-0 num">
                         {format(new Date(n.createdAt), 'h:mm a')}
                       </div>
                     </div>
-                    <div className="text-sm text-soft mt-0.5 leading-relaxed">
+                    <div className="text-[13px] text-soft mt-1 leading-relaxed">
                       {n.body}
                     </div>
                   </div>
+                  {!n.read && (
+                    <span className="h-2 w-2 rounded-full bg-ink mt-1.5 shrink-0" />
+                  )}
                 </button>
               ))}
             </div>

@@ -6,10 +6,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-/** Format a number as money. Drops cents when whole. */
+/** Format a number as money. Drops cents when whole. Adds comma separators. */
 export function money(n: number): string {
   const abs = Math.abs(n)
-  const formatted = abs % 1 === 0 ? abs.toFixed(0) : abs.toFixed(2)
+  const showCents = abs % 1 !== 0
+  const formatted = abs.toLocaleString('en-US', {
+    minimumFractionDigits: showCents ? 2 : 0,
+    maximumFractionDigits: showCents ? 2 : 0,
+  })
   return `${n < 0 ? '−' : ''}$${formatted}`
 }
 
@@ -18,7 +22,11 @@ export function signedMoney(n: number): string {
   if (n === 0) return '$0'
   const sign = n > 0 ? '+' : '−'
   const abs = Math.abs(n)
-  const formatted = abs % 1 === 0 ? abs.toFixed(0) : abs.toFixed(2)
+  const showCents = abs % 1 !== 0
+  const formatted = abs.toLocaleString('en-US', {
+    minimumFractionDigits: showCents ? 2 : 0,
+    maximumFractionDigits: showCents ? 2 : 0,
+  })
   return `${sign}$${formatted}`
 }
 
@@ -36,8 +44,7 @@ export function statusColor(pct: number): 'green' | 'amber' | 'red' {
 
 /**
  * Generate a unique ID. Uses crypto.randomUUID() in secure contexts
- * (HTTPS or localhost), falls back to a timestamp+random string otherwise
- * (e.g. when accessing the dev server via LAN IP over plain HTTP).
+ * (HTTPS or localhost), falls back to a timestamp+random string otherwise.
  */
 export function uid(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {

@@ -7,7 +7,6 @@ import type {
   User,
 } from '@/lib/types'
 
-/** Stable IDs so demo data is deterministic. */
 const CAT = {
   restaurants: 'cat-restaurants',
   coffee: 'cat-coffee',
@@ -29,12 +28,12 @@ export const seedUser: User = {
 }
 
 export const seedCategories: Category[] = [
-  { id: CAT.restaurants, name: 'Restaurants', icon: 'UtensilsCrossed', emoji: '🍔', monthlyBudget: 150 },
-  { id: CAT.coffee, name: 'Coffee', icon: 'Coffee', emoji: '☕', monthlyBudget: 40 },
-  { id: CAT.shopping, name: 'Shopping', icon: 'ShoppingBag', emoji: '🛍️', monthlyBudget: 80 },
-  { id: CAT.fun, name: 'Fun', icon: 'Ticket', emoji: '🎬', monthlyBudget: 50 },
-  { id: CAT.subs, name: 'Subscriptions', icon: 'Repeat', emoji: '📺', monthlyBudget: 25 },
-  { id: CAT.transport, name: 'Transport', icon: 'Car', emoji: '🚗', monthlyBudget: 40 },
+  { id: CAT.restaurants, name: 'Restaurants',   icon: 'UtensilsCrossed', monthlyBudget: 150 },
+  { id: CAT.coffee,      name: 'Coffee',        icon: 'Coffee',          monthlyBudget: 40 },
+  { id: CAT.shopping,    name: 'Shopping',      icon: 'ShoppingBag',     monthlyBudget: 80 },
+  { id: CAT.fun,         name: 'Fun',           icon: 'Ticket',          monthlyBudget: 50 },
+  { id: CAT.subs,        name: 'Subscriptions', icon: 'Repeat',          monthlyBudget: 25 },
+  { id: CAT.transport,   name: 'Transport',     icon: 'Car',             monthlyBudget: 40 },
 ]
 
 export const seedTransactions: Transaction[] = [
@@ -64,7 +63,7 @@ export const seedGoals: SavingsGoal[] = [
   {
     id: 'goal-spring-break',
     name: 'Spring Break Trip',
-    emoji: '🌴',
+    icon: 'Plane',
     targetAmount: 400,
     currentAmount: 180,
     targetDate: '2027-03-15',
@@ -82,7 +81,7 @@ export const seedNotifications: NotificationItem[] = [
     id: 'n-1',
     type: 'pattern',
     title: 'Coffee check-in',
-    body: "That's coffee #3 this week — $20 total. You've got $20 left for the month ☕",
+    body: "That's coffee #3 this week — $20 total. You've got $20 left for the month.",
     transactionId: 't-07',
     categoryId: CAT.coffee,
     read: false,
@@ -112,7 +111,7 @@ export const seedNotifications: NotificationItem[] = [
     id: 'n-4',
     type: 'safe',
     title: 'Still on track',
-    body: 'That $38.99 at Amazon puts shopping at 82% — 2 weeks to go. You\'re fine.',
+    body: "That $38.99 at Amazon puts shopping at 82% — 2 weeks to go. You're fine.",
     transactionId: 't-14',
     categoryId: CAT.shopping,
     read: true,

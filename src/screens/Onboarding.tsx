@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
+import { Icon } from '@/components/Icon'
 import { useAppStore } from '@/store/useAppStore'
 import { Button } from '@/components/ui/Button'
 import {
@@ -18,19 +19,19 @@ const AGES: { value: AgeRange; label: string }[] = [
   { value: '23-25', label: '23–25' },
 ]
 
-const GOALS: { value: PrimaryGoal; label: string; emoji: string }[] = [
-  { value: 'spend_less',    label: 'Spend less',             emoji: '💸' },
-  { value: 'save_for_goal', label: 'Save for something',     emoji: '🎯' },
-  { value: 'stop_impulse',  label: 'Stop impulse shopping',  emoji: '🛑' },
-  { value: 'track_food',    label: 'Track food spending',    emoji: '🍔' },
-  { value: 'stay_under',    label: 'Stay under budget',      emoji: '📊' },
-  { value: 'build_habits',  label: 'Build better habits',    emoji: '🌱' },
+const GOALS: { value: PrimaryGoal; label: string; icon: string }[] = [
+  { value: 'spend_less',    label: 'Spend less',             icon: 'TrendingDown' },
+  { value: 'save_for_goal', label: 'Save for something',     icon: 'Target' },
+  { value: 'stop_impulse',  label: 'Stop impulse shopping',  icon: 'Hand' },
+  { value: 'track_food',    label: 'Track food spending',    icon: 'UtensilsCrossed' },
+  { value: 'stay_under',    label: 'Stay under budget',      icon: 'BarChart3' },
+  { value: 'build_habits',  label: 'Build better habits',    icon: 'Sprout' },
 ]
 
-const TONES: { value: ToneMode; label: string; emoji: string; body: string }[] = [
-  { value: 'strict',   label: 'Strict',   emoji: '🎯', body: 'Ping me early, ping me often.' },
-  { value: 'balanced', label: 'Balanced', emoji: '⚖️', body: 'Tell me when it matters.' },
-  { value: 'chill',    label: 'Chill',    emoji: '🌊', body: 'Just the big stuff.' },
+const TONES: { value: ToneMode; label: string; icon: string; body: string }[] = [
+  { value: 'strict',   label: 'Strict',   icon: 'Target', body: 'Ping me early, ping me often.' },
+  { value: 'balanced', label: 'Balanced', icon: 'Equal',  body: 'Tell me when it matters.' },
+  { value: 'chill',    label: 'Chill',    icon: 'Waves',  body: 'Just the big stuff.' },
 ]
 
 export function Onboarding() {
@@ -55,7 +56,7 @@ export function Onboarding() {
 
   const steps = [
     {
-      title: "Hey 👋 what's your name?",
+      title: "What's your name?",
       sub: 'We use this to make things feel like yours.',
       content: (
         <input
@@ -64,7 +65,7 @@ export function Onboarding() {
           onChange={(e) => setName(e.target.value)}
           placeholder="Your first name"
           autoFocus
-          className="w-full h-16 px-4 bg-card-2 rounded-2xl text-2xl font-semibold text-ink placeholder:text-soft focus:outline-none focus:ring-2 focus:ring-brand"
+          className="w-full h-16 px-4 bg-card-2 rounded-2xl text-2xl font-semibold text-ink placeholder:text-soft focus:outline-none focus:ring-2 focus:ring-ink/20 tracking-tight"
         />
       ),
     },
@@ -89,7 +90,7 @@ export function Onboarding() {
       sub: 'Allowance, job, parents — anything counts.',
       content: (
         <div>
-          <div className="text-xs text-soft uppercase tracking-wide mb-1">
+          <div className="text-[11px] text-soft uppercase tracking-[0.16em] font-semibold mb-2">
             Per month
           </div>
           <div className="relative">
@@ -103,7 +104,7 @@ export function Onboarding() {
               onChange={(e) => setIncome(e.target.value)}
               placeholder="600"
               autoFocus
-              className="num w-full h-16 pl-10 pr-3 bg-card-2 rounded-2xl text-3xl font-semibold text-ink placeholder:text-soft focus:outline-none focus:ring-2 focus:ring-brand"
+              className="num display w-full h-16 pl-10 pr-3 bg-card-2 rounded-2xl text-3xl font-bold text-ink placeholder:text-soft focus:outline-none focus:ring-2 focus:ring-ink/20"
             />
           </div>
         </div>
@@ -137,7 +138,7 @@ export function Onboarding() {
               active={goal === g.value}
               onClick={() => setGoal(g.value)}
               label={g.label}
-              emoji={g.emoji}
+              icon={g.icon}
               variant="row"
             />
           ))}
@@ -148,7 +149,7 @@ export function Onboarding() {
       title: 'What do you spend on?',
       sub: `Pick at least 3. (${picked.length} selected)`,
       content: (
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-2.5">
           {ONBOARDING_CATEGORIES.map((c) => {
             const def = CATEGORY_DEFAULTS[c]
             const active = picked.includes(c)
@@ -158,14 +159,14 @@ export function Onboarding() {
                 type="button"
                 onClick={() => togglePick(c)}
                 className={cn(
-                  'h-20 rounded-2xl border tap flex flex-col items-center justify-center gap-1',
+                  'h-[90px] rounded-2xl tap flex flex-col items-center justify-center gap-1.5 transition-all',
                   active
-                    ? 'bg-brand-soft border-brand text-[var(--color-brand-strong)]'
-                    : 'bg-card border-line text-ink',
+                    ? 'bg-ink text-white dark:bg-white dark:text-ink'
+                    : 'bg-card-2 text-ink',
                 )}
               >
-                <span className="text-2xl">{def?.emoji}</span>
-                <span className="text-xs font-semibold">{c}</span>
+                <Icon name={def?.icon ?? 'Layers'} size={20} strokeWidth={1.75} />
+                <span className="text-[11px] font-semibold tracking-tight">{c}</span>
               </button>
             )
           })}
@@ -177,24 +178,39 @@ export function Onboarding() {
       sub: 'You can change this anytime.',
       content: (
         <div className="space-y-2">
-          {TONES.map((t) => (
-            <button
-              key={t.value}
-              type="button"
-              onClick={() => setTone(t.value)}
-              className={cn(
-                'w-full text-left p-4 rounded-2xl border tap',
-                tone === t.value
-                  ? 'bg-brand-soft border-brand'
-                  : 'bg-card border-line',
-              )}
-            >
-              <div className="flex items-center gap-2 text-[15px] font-semibold">
-                <span className="text-xl">{t.emoji}</span> {t.label}
-              </div>
-              <div className="text-sm text-soft mt-1">{t.body}</div>
-            </button>
-          ))}
+          {TONES.map((t) => {
+            const active = tone === t.value
+            return (
+              <button
+                key={t.value}
+                type="button"
+                onClick={() => setTone(t.value)}
+                className={cn(
+                  'w-full text-left p-4 rounded-2xl tap transition-colors flex items-start gap-3',
+                  active
+                    ? 'bg-ink text-white dark:bg-white dark:text-ink'
+                    : 'bg-card-2 text-ink',
+                )}
+              >
+                <div
+                  className={cn(
+                    'h-10 w-10 rounded-xl flex items-center justify-center shrink-0',
+                    active
+                      ? 'bg-white/10 dark:bg-ink/10'
+                      : 'bg-card',
+                  )}
+                >
+                  <Icon name={t.icon} size={18} strokeWidth={1.75} />
+                </div>
+                <div className="flex-1">
+                  <div className="text-[15px] font-semibold tracking-tight">{t.label}</div>
+                  <div className={cn('text-[13px] mt-0.5', active ? 'opacity-70' : 'text-soft')}>
+                    {t.body}
+                  </div>
+                </div>
+              </button>
+            )
+          })}
         </div>
       ),
     },
@@ -228,19 +244,20 @@ export function Onboarding() {
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', damping: 16 }}
-          className="h-20 w-20 rounded-full bg-brand text-white flex items-center justify-center mb-4"
+          className="h-16 w-16 rounded-full bg-ink text-white dark:bg-white dark:text-ink flex items-center justify-center mb-5"
         >
-          <Check size={40} strokeWidth={3} />
+          <Check size={32} strokeWidth={2.5} />
         </motion.div>
-        <h1 className="text-2xl font-semibold">You're set, {name.trim() || 'friend'}.</h1>
-        <p className="text-sm text-soft mt-1">Loading your dashboard…</p>
+        <h1 className="text-[26px] font-semibold tracking-tight">
+          You're set, {name.trim() || 'friend'}.
+        </h1>
+        <p className="text-[13px] text-soft mt-1.5">Loading your dashboard…</p>
       </div>
     )
   }
 
   return (
     <div className="h-full flex flex-col px-5 pt-5 pb-6">
-      {/* Top bar */}
       <div className="flex items-center gap-2">
         <button
           type="button"
@@ -250,12 +267,12 @@ export function Onboarding() {
               : prev
           }
           className={cn(
-            'h-10 w-10 rounded-full bg-card border border-line flex items-center justify-center tap',
+            'h-10 w-10 rounded-full bg-card flex items-center justify-center tap shadow-[var(--shadow-card)]',
             step === 0 && !user && 'invisible',
           )}
           aria-label="Back"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={17} strokeWidth={1.75} />
         </button>
         <div className="flex-1 flex gap-1.5 px-2">
           {steps.map((_, idx) => (
@@ -263,15 +280,14 @@ export function Onboarding() {
               key={idx}
               className={cn(
                 'flex-1 h-1 rounded-full transition-colors',
-                idx <= step ? 'bg-brand' : 'bg-[var(--surface-2)]',
+                idx <= step ? 'bg-ink dark:bg-white' : 'bg-[var(--surface-2)]',
               )}
             />
           ))}
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 flex flex-col mt-6 min-h-0">
+      <div className="flex-1 flex flex-col mt-7 min-h-0">
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
@@ -281,18 +297,17 @@ export function Onboarding() {
             transition={{ duration: 0.2 }}
             className="flex-1 overflow-y-auto"
           >
-            <h1 className="text-[26px] font-semibold tracking-tight leading-tight">
+            <h1 className="text-[28px] font-semibold tracking-tight leading-tight">
               {steps[step].title}
             </h1>
             {steps[step].sub && (
-              <p className="text-sm text-soft mt-1.5">{steps[step].sub}</p>
+              <p className="text-[13px] text-soft mt-2">{steps[step].sub}</p>
             )}
-            <div className="mt-6 pb-4">{steps[step].content}</div>
+            <div className="mt-7 pb-4">{steps[step].content}</div>
           </motion.div>
         </AnimatePresence>
       </div>
 
-      {/* Bottom action */}
       <div className="pt-3 space-y-2">
         <Button
           size="lg"
@@ -300,7 +315,7 @@ export function Onboarding() {
           onClick={step === steps.length - 1 ? finish : next}
         >
           {step === steps.length - 1 ? "Let's go" : 'Continue'}
-          <ArrowRight size={18} />
+          <ArrowRight size={17} strokeWidth={1.75} />
         </Button>
         {step === 0 && !user && (
           <button
@@ -309,9 +324,9 @@ export function Onboarding() {
               loadDemo()
               navigate('/', { replace: true })
             }}
-            className="w-full text-xs text-soft py-2 tap"
+            className="w-full text-[12px] text-soft py-2 tap"
           >
-            Or skip — try the demo (Maya's account)
+            Or try the demo account
           </button>
         )}
       </div>
@@ -323,13 +338,13 @@ function PickerCard({
   active,
   onClick,
   label,
-  emoji,
+  icon,
   variant = 'card',
 }: {
   active: boolean
   onClick: () => void
   label: string
-  emoji?: string
+  icon?: string
   variant?: 'card' | 'row'
 }) {
   if (variant === 'row') {
@@ -338,12 +353,23 @@ function PickerCard({
         type="button"
         onClick={onClick}
         className={cn(
-          'w-full text-left p-4 rounded-2xl border tap flex items-center gap-3',
-          active ? 'bg-brand-soft border-brand' : 'bg-card border-line',
+          'w-full text-left p-4 rounded-2xl tap flex items-center gap-3 transition-colors',
+          active
+            ? 'bg-ink text-white dark:bg-white dark:text-ink'
+            : 'bg-card-2 text-ink',
         )}
       >
-        {emoji && <span className="text-xl">{emoji}</span>}
-        <span className="text-[15px] font-semibold">{label}</span>
+        {icon && (
+          <div
+            className={cn(
+              'h-9 w-9 rounded-xl flex items-center justify-center shrink-0',
+              active ? 'bg-white/10 dark:bg-ink/10' : 'bg-card',
+            )}
+          >
+            <Icon name={icon} size={17} strokeWidth={1.75} />
+          </div>
+        )}
+        <span className="text-[15px] font-semibold tracking-tight">{label}</span>
       </button>
     )
   }
@@ -352,10 +378,10 @@ function PickerCard({
       type="button"
       onClick={onClick}
       className={cn(
-        'h-20 rounded-2xl text-lg font-semibold tap border',
+        'h-20 rounded-2xl text-lg font-semibold tap transition-colors tracking-tight',
         active
-          ? 'bg-brand-soft border-brand text-[var(--color-brand-strong)]'
-          : 'bg-card border-line text-ink',
+          ? 'bg-ink text-white dark:bg-white dark:text-ink'
+          : 'bg-card-2 text-ink',
       )}
     >
       {label}

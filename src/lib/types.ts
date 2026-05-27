@@ -26,7 +26,7 @@ export interface Category {
   id: string
   name: string
   icon: string // lucide icon name
-  emoji: string
+  emoji?: string // deprecated — kept optional for legacy stored data
   monthlyBudget: number
 }
 
@@ -67,7 +67,8 @@ export interface NotificationItem {
 export interface SavingsGoal {
   id: string
   name: string
-  emoji: string
+  icon: string // lucide icon name
+  emoji?: string // deprecated
   targetAmount: number
   currentAmount: number
   targetDate?: string

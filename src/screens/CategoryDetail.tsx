@@ -12,6 +12,7 @@ import {
 import { useAppStore } from '@/store/useAppStore'
 import { Card } from '@/components/ui/Card'
 import { TransactionRow } from '@/components/TransactionRow'
+import { Icon } from '@/components/Icon'
 import {
   categorySpentThisMonth,
   dailyCumulativeForCategory,
@@ -50,7 +51,6 @@ export function CategoryDetail() {
   const txns = transactions.filter((t) => t.categoryId === category.id)
   const groups = groupTransactionsByDate(txns)
 
-  // Chart data with pace line
   const chartData = dailyCumulativeForCategory(transactions, category.id, now)
   const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
   const dataWithPace = chartData.map((d) => ({
@@ -58,43 +58,43 @@ export function CategoryDetail() {
     pace: (category.monthlyBudget / daysInMonth) * d.day,
   }))
 
-  // Stats
   const avgTxn = txns.length ? txns.reduce((s, t) => s + t.amount, 0) / txns.length : 0
   const biggest = [...txns].sort((a, b) => b.amount - a.amount)[0]
 
   const chartColor =
-    status === 'green' ? '#1FBF75' : status === 'amber' ? '#F5B731' : '#F2545B'
+    status === 'green' ? '#16965A' : status === 'amber' ? '#D89614' : '#DC4A4A'
 
   return (
     <div className="pb-8">
-      <header className="px-5 pt-4 flex items-center gap-3">
+      <header className="px-5 pt-5 flex items-center gap-3">
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="h-10 w-10 rounded-full bg-card border border-line flex items-center justify-center tap"
+          className="h-10 w-10 rounded-full bg-card flex items-center justify-center tap shadow-[var(--shadow-card)]"
           aria-label="Back"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={17} strokeWidth={1.75} />
         </button>
-        <div className="flex items-center gap-2">
-          <span className="text-xl">{category.emoji}</span>
+        <div className="flex items-center gap-2.5">
+          <div className="h-8 w-8 rounded-lg bg-card-2 text-ink flex items-center justify-center">
+            <Icon name={category.icon} size={16} strokeWidth={1.75} />
+          </div>
           <h1 className="text-[18px] font-semibold tracking-tight">{category.name}</h1>
         </div>
       </header>
 
       <div className="px-5 mt-5 space-y-4">
-        {/* Hero */}
         <Card>
-          <div className="num text-3xl font-semibold tracking-tight">
+          <div className="display num text-[32px] font-bold">
             {money(spent)}{' '}
-            <span className="text-base text-soft font-medium">
+            <span className="text-[15px] text-soft font-semibold tracking-tight">
               of {money(category.monthlyBudget)}
             </span>
           </div>
-          <div className="num text-sm text-soft mt-1">
+          <div className="num text-[12px] text-soft mt-1">
             {money(remaining)} left this month
           </div>
-          <div className="mt-3 h-2 bg-[var(--surface-2)] rounded-full overflow-hidden">
+          <div className="mt-4 h-1.5 bg-[var(--surface-2)] rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all"
               style={{
@@ -105,7 +105,7 @@ export function CategoryDetail() {
           </div>
           <span
             className={[
-              'inline-block mt-3 text-[11px] font-semibold uppercase tracking-wide px-2 py-1 rounded-full',
+              'inline-block mt-4 text-[10px] font-semibold uppercase tracking-[0.16em] px-2.5 py-1 rounded-full',
               STATUS_LABEL[status].tint,
             ].join(' ')}
           >
@@ -113,33 +113,22 @@ export function CategoryDetail() {
           </span>
         </Card>
 
-        {/* Chart */}
         <Card>
-          <h3 className="text-[13px] font-semibold mb-3">Spending this month</h3>
+          <h3 className="text-[12px] font-semibold tracking-tight uppercase text-soft mb-3">
+            Spending this month
+          </h3>
           <div className="h-44 -mx-2">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={dataWithPace} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="catFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={chartColor} stopOpacity={0.35} />
+                    <stop offset="0%" stopColor={chartColor} stopOpacity={0.3} />
                     <stop offset="100%" stopColor={chartColor} stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid stroke="var(--line)" strokeDasharray="2 4" vertical={false} />
-                <XAxis
-                  dataKey="day"
-                  stroke="var(--soft)"
-                  fontSize={10}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  stroke="var(--soft)"
-                  fontSize={10}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(v) => `$${v}`}
-                />
+                <XAxis dataKey="day" stroke="var(--soft)" fontSize={10} tickLine={false} axisLine={false} />
+                <YAxis stroke="var(--soft)" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v}`} />
                 <ReferenceLine
                   y={category.monthlyBudget}
                   stroke="var(--soft)"
@@ -171,34 +160,34 @@ export function CategoryDetail() {
           </div>
         </Card>
 
-        {/* Stats */}
         <Card>
           <div className="grid grid-cols-3 gap-3 text-center">
             <div>
-              <div className="num text-base font-semibold">{money(avgTxn)}</div>
-              <div className="text-[11px] text-soft mt-0.5">Avg / txn</div>
+              <div className="num text-[15px] font-semibold tracking-tight">{money(avgTxn)}</div>
+              <div className="text-[11px] text-soft mt-1">Avg / txn</div>
             </div>
             <div>
-              <div className="num text-base font-semibold">{txns.length}</div>
-              <div className="text-[11px] text-soft mt-0.5">Transactions</div>
+              <div className="num text-[15px] font-semibold tracking-tight">{txns.length}</div>
+              <div className="text-[11px] text-soft mt-1">Transactions</div>
             </div>
             <div>
-              <div className="text-base font-semibold truncate">
+              <div className="text-[15px] font-semibold truncate tracking-tight">
                 {biggest?.merchant ?? '—'}
               </div>
-              <div className="text-[11px] text-soft mt-0.5 num">
+              <div className="text-[11px] text-soft mt-1 num">
                 Biggest {biggest ? money(biggest.amount) : ''}
               </div>
             </div>
           </div>
         </Card>
 
-        {/* Transactions */}
         <section>
-          <h3 className="text-[13px] font-semibold mb-1.5 px-1">Transactions</h3>
+          <h3 className="text-[12px] font-semibold tracking-tight uppercase text-soft mb-2 px-1">
+            Transactions
+          </h3>
           {groups.map((group) => (
             <div key={group.dateKey} className="mb-3">
-              <div className="text-[11px] text-soft uppercase tracking-wide font-semibold px-1 mb-1.5">
+              <div className="text-[11px] text-soft uppercase tracking-[0.16em] font-semibold px-1 mb-1.5">
                 {group.label}
               </div>
               <Card className="py-1 divide-y divide-line">
@@ -214,10 +203,7 @@ export function CategoryDetail() {
           ))}
         </section>
 
-        <Link
-          to="/"
-          className="block text-center text-sm text-soft pt-2"
-        >
+        <Link to="/" className="block text-center text-[13px] text-soft pt-2">
           ← Back to home
         </Link>
       </div>

@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useAppStore } from '@/store/useAppStore'
 import { Button } from '@/components/ui/Button'
+import { Icon } from '@/components/Icon'
 import {
   categorySpentThisMonth,
   spentLastWeek,
@@ -28,63 +29,74 @@ export function WeeklySummary() {
       spent: categorySpentThisMonth(transactions, c.id, now),
     }))
     .sort((a, b) => b.spent - a.spent)[0]
-  const topPct = topCat ? Math.round((topCat.spent / thisWeek) * 100) : 0
+  const topPct = topCat && thisWeek > 0 ? Math.round((topCat.spent / thisWeek) * 100) : 0
 
   const slides = [
     {
-      bg: 'from-[#1FBF75] to-[#15A05F]',
+      bg: 'from-[#0F1115] to-[#1F242C]',
       content: (
         <div className="flex flex-col items-center text-center text-white">
-          <div className="text-sm uppercase tracking-wide opacity-80">Your week</div>
-          <div className="num text-[64px] font-bold leading-none mt-3">
+          <div className="text-[10px] uppercase tracking-[0.3em] opacity-70 font-semibold">
+            Your week
+          </div>
+          <div className="display num text-[80px] font-bold leading-none mt-4">
             {money(thisWeek)}
           </div>
-          <div className="text-sm opacity-90 mt-2">spent over 7 days</div>
+          <div className="text-[13px] opacity-80 mt-3">spent over 7 days</div>
         </div>
       ),
     },
     {
-      bg: 'from-[#F5B731] to-[#E09A0A]',
+      bg: 'from-[#16965A] to-[#0E6F43]',
       content: (
         <div className="flex flex-col items-center text-center text-white">
-          <div className="text-6xl mb-3">{topCat?.emoji ?? '🍔'}</div>
-          <div className="text-sm uppercase tracking-wide opacity-80">Biggest category</div>
-          <div className="text-[36px] font-bold mt-2">{topCat?.name}</div>
-          <div className="text-base opacity-90 mt-2 num">
+          {topCat && (
+            <div className="h-16 w-16 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center mb-4">
+              <Icon name={topCat.icon} size={28} strokeWidth={1.75} />
+            </div>
+          )}
+          <div className="text-[10px] uppercase tracking-[0.3em] opacity-70 font-semibold">
+            Biggest category
+          </div>
+          <div className="text-[36px] font-bold mt-2 tracking-tight">{topCat?.name}</div>
+          <div className="text-[13px] opacity-90 mt-2 num">
             {money(topCat?.spent ?? 0)} · {topPct}% of the week
           </div>
         </div>
       ),
     },
     {
-      bg: delta > 0 ? 'from-[#F2545B] to-[#C13942]' : 'from-[#1FBF75] to-[#15A05F]',
+      bg: delta > 0 ? 'from-[#DC4A4A] to-[#A03333]' : 'from-[#16965A] to-[#0E6F43]',
       content: (
         <div className="flex flex-col items-center text-center text-white">
-          <div className="text-sm uppercase tracking-wide opacity-80">vs. last week</div>
-          <div className="num text-[64px] font-bold leading-none mt-3">
+          <div className="text-[10px] uppercase tracking-[0.3em] opacity-70 font-semibold">
+            vs. last week
+          </div>
+          <div className="display num text-[80px] font-bold leading-none mt-4">
             {signedMoney(delta)}
           </div>
-          <div className="text-sm opacity-90 mt-2">
+          <div className="text-[13px] opacity-80 mt-3">
             {delta > 0 ? 'Up this week' : delta < 0 ? 'Down — nice' : 'Even keel'}
           </div>
         </div>
       ),
     },
     {
-      bg: 'from-[#0F1115] to-[#2A2E37]',
+      bg: 'from-[#0A0C12] to-[#2A2E37]',
       content: (
         <div className="flex flex-col items-center text-center text-white">
-          <div className="text-sm uppercase tracking-wide opacity-80">This week's challenge</div>
-          <div className="text-[26px] font-bold mt-3 leading-snug">
+          <div className="text-[10px] uppercase tracking-[0.3em] opacity-70 font-semibold">
+            This week's challenge
+          </div>
+          <div className="text-[26px] font-bold mt-3 leading-snug tracking-tight max-w-xs">
             Skip one delivery order
           </div>
-          <div className="text-base opacity-80 mt-2 max-w-xs">
+          <div className="text-[13px] opacity-80 mt-3 max-w-xs leading-relaxed">
             You usually save ~$22 in a week when you cook one extra meal.
           </div>
           <Button
-            variant="primary"
             size="md"
-            className="mt-5 w-auto bg-white text-black hover:bg-white/90"
+            className="mt-6 w-auto bg-white text-ink hover:bg-white/90"
             onClick={() => navigate('/coach')}
           >
             Accept
@@ -112,13 +124,12 @@ export function WeeklySummary() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 md:absolute md:inset-auto md:top-0 md:left-0 md:right-0 md:bottom-0 md:rounded-[44px] md:overflow-hidden">
+    <div className="absolute inset-0 z-50 overflow-hidden">
       <div className={`absolute inset-0 bg-gradient-to-br ${slides[i].bg} transition-colors`} />
 
-      {/* Progress bars */}
       <div className="absolute top-3 left-3 right-3 flex gap-1 z-10">
         {slides.map((_, idx) => (
-          <div key={idx} className="flex-1 h-1 rounded-full bg-white/20 overflow-hidden">
+          <div key={idx} className="flex-1 h-[3px] rounded-full bg-white/20 overflow-hidden">
             {idx < i && <div className="h-full w-full bg-white" />}
             {idx === i && (
               <motion.div
@@ -133,17 +144,15 @@ export function WeeklySummary() {
         ))}
       </div>
 
-      {/* Close */}
       <button
         type="button"
         onClick={() => navigate('/')}
         className="absolute top-7 right-4 z-10 h-9 w-9 rounded-full bg-white/15 backdrop-blur flex items-center justify-center text-white tap"
         aria-label="Close"
       >
-        <X size={18} />
+        <X size={17} strokeWidth={1.75} />
       </button>
 
-      {/* Tap zones */}
       <button
         type="button"
         onClick={() => advance(-1)}
@@ -157,11 +166,10 @@ export function WeeklySummary() {
         aria-label="Next"
       />
 
-      {/* Slide content */}
       <AnimatePresence mode="wait">
         <motion.div
           key={i}
-          initial={{ opacity: 0, scale: 0.96 }}
+          initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 1.02 }}
           transition={{ duration: 0.25 }}

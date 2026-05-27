@@ -1,23 +1,23 @@
 import type { Category, NotificationItem } from '@/lib/types'
 import { uid } from '@/lib/utils'
 
-/** Default weights + icons for the 12 onboarding category choices. */
+/** Default icons + weights for the 12 onboarding category choices. */
 export const CATEGORY_DEFAULTS: Record<
   string,
-  { icon: string; emoji: string; weight: number }
+  { icon: string; weight: number }
 > = {
-  Restaurants:   { icon: 'UtensilsCrossed', emoji: '🍔',  weight: 4 },
-  Coffee:        { icon: 'Coffee',          emoji: '☕',  weight: 1 },
-  Shopping:      { icon: 'ShoppingBag',     emoji: '🛍️', weight: 2 },
-  Fun:           { icon: 'Ticket',          emoji: '🎬',  weight: 2 },
-  Subscriptions: { icon: 'Repeat',          emoji: '📺',  weight: 1 },
-  Transport:     { icon: 'Car',             emoji: '🚗',  weight: 1.5 },
-  Beauty:        { icon: 'Sparkles',        emoji: '💄',  weight: 1.5 },
-  Gaming:        { icon: 'Gamepad2',        emoji: '🎮',  weight: 1 },
-  School:        { icon: 'GraduationCap',   emoji: '📚',  weight: 1 },
-  Sports:        { icon: 'Trophy',          emoji: '⚽',  weight: 1 },
-  Gifts:         { icon: 'Gift',            emoji: '🎁',  weight: 0.5 },
-  Other:         { icon: 'Layers',          emoji: '✨',  weight: 1 },
+  Restaurants:   { icon: 'UtensilsCrossed', weight: 4 },
+  Coffee:        { icon: 'Coffee',          weight: 1 },
+  Shopping:      { icon: 'ShoppingBag',     weight: 2 },
+  Fun:           { icon: 'Ticket',          weight: 2 },
+  Subscriptions: { icon: 'Repeat',          weight: 1 },
+  Transport:     { icon: 'Car',             weight: 1.5 },
+  Beauty:        { icon: 'Sparkles',        weight: 1.5 },
+  Gaming:        { icon: 'Gamepad2',        weight: 1 },
+  School:        { icon: 'GraduationCap',   weight: 1 },
+  Sports:        { icon: 'Trophy',          weight: 1 },
+  Gifts:         { icon: 'Gift',            weight: 0.5 },
+  Other:         { icon: 'Layers',          weight: 1 },
 }
 
 export const ONBOARDING_CATEGORIES = Object.keys(CATEGORY_DEFAULTS)
@@ -37,18 +37,13 @@ export function generateCategories(
   )
   const spendable = Math.max(0, income) * 0.9
   return picked.map((name) => {
-    const def = CATEGORY_DEFAULTS[name] ?? {
-      icon: 'Layers',
-      emoji: '✨',
-      weight: 1,
-    }
+    const def = CATEGORY_DEFAULTS[name] ?? { icon: 'Layers', weight: 1 }
     const raw = totalWeight > 0 ? (def.weight / totalWeight) * spendable : 0
     const budget = Math.max(10, Math.round(raw / 5) * 5)
     return {
       id: uid(),
       name,
       icon: def.icon,
-      emoji: def.emoji,
       monthlyBudget: budget,
     }
   })

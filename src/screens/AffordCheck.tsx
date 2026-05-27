@@ -1,9 +1,18 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, ChevronDown, Delete, Sparkles } from 'lucide-react'
+import {
+  AlertTriangle,
+  ArrowLeft,
+  Check,
+  ChevronDown,
+  Delete,
+  Equal,
+  Sparkles,
+} from 'lucide-react'
 import { useAppStore } from '@/store/useAppStore'
 import { Button } from '@/components/ui/Button'
+import { Icon } from '@/components/Icon'
 import {
   categorySpentThisMonth,
   totalBudget,
@@ -49,7 +58,6 @@ export function AffordCheck() {
       return
     }
 
-    // Over the category budget — compute tradeoffs from other categories with most room
     const over = Math.abs(catRemaining)
     const otherRoom = categories
       .filter((c) => c.id !== category.id)
@@ -81,7 +89,7 @@ export function AffordCheck() {
       setVerdict({
         status: 'amber',
         headline: 'Tight, but doable.',
-        detail: `${category.name} would go ${money(over)} over. Here's how to fit it in:`,
+        detail: `${category.name} would go ${money(over)} over. Here's how to fit it in.`,
         tradeoffs,
       })
     }
@@ -106,35 +114,45 @@ export function AffordCheck() {
   const verdictStyles = useMemo(() => {
     if (!verdict) return null
     if (verdict.status === 'green')
-      return { bg: 'bg-brand-soft', text: 'text-[var(--color-brand-strong)]', emoji: '✅' }
+      return {
+        bg: 'bg-brand-soft',
+        text: 'text-[var(--color-brand-strong)]',
+        Icon: Check,
+      }
     if (verdict.status === 'amber')
-      return { bg: 'bg-warning-soft', text: 'text-[#8a6a17]', emoji: '⚖️' }
-    return { bg: 'bg-alert-soft', text: 'text-[#9b3338]', emoji: '🛑' }
+      return {
+        bg: 'bg-warning-soft',
+        text: 'text-[#8a6a17]',
+        Icon: Equal,
+      }
+    return {
+      bg: 'bg-alert-soft',
+      text: 'text-[#9b3338]',
+      Icon: AlertTriangle,
+    }
   }, [verdict])
 
   return (
-    <div className="flex flex-col h-full px-5 pt-4 pb-6">
+    <div className="flex flex-col h-full px-5 pt-5 pb-6">
       <header className="flex items-center gap-3">
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="h-10 w-10 rounded-full bg-card border border-line flex items-center justify-center tap"
+          className="h-10 w-10 rounded-full bg-card flex items-center justify-center tap shadow-[var(--shadow-card)]"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={17} strokeWidth={1.75} />
         </button>
         <h1 className="text-[18px] font-semibold tracking-tight">Can I afford this?</h1>
       </header>
 
-      {/* Amount display */}
       <div className="flex-1 flex flex-col items-center justify-center mt-6">
-        <div className="text-soft text-xs uppercase tracking-wide font-medium mb-3">
+        <div className="text-[11px] text-soft uppercase tracking-[0.2em] font-semibold mb-4">
           Amount
         </div>
-        <div className="num text-[56px] font-semibold leading-none tracking-tight">
+        <div className="num display text-[64px] font-bold">
           ${amount || '0'}
         </div>
 
-        {/* Category picker */}
         <div className="mt-6 flex gap-2 overflow-x-auto no-scrollbar max-w-full px-5 -mx-5">
           {categories.map((c) => {
             const active = c.id === categoryId
@@ -147,13 +165,13 @@ export function AffordCheck() {
                   setVerdict(null)
                 }}
                 className={cn(
-                  'shrink-0 h-10 px-3 rounded-full text-sm font-medium tap border inline-flex items-center gap-1.5',
+                  'shrink-0 h-10 px-3.5 rounded-full text-[13px] font-semibold tap inline-flex items-center gap-1.5 transition-colors',
                   active
-                    ? 'bg-ink text-white border-ink'
-                    : 'bg-card text-ink border-line',
+                    ? 'bg-ink text-white dark:bg-white dark:text-ink'
+                    : 'bg-card-2 text-ink',
                 )}
               >
-                <span>{c.emoji}</span>
+                <Icon name={c.icon} size={14} strokeWidth={1.75} />
                 {c.name}
               </button>
             )
@@ -161,31 +179,30 @@ export function AffordCheck() {
         </div>
       </div>
 
-      {/* Numpad */}
       <div className="grid grid-cols-3 gap-2 mt-6">
         {['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'back'].map((k) => (
           <button
             key={k}
             type="button"
             onClick={() => handleKey(k)}
-            className="h-14 rounded-2xl bg-card border border-line text-xl font-medium tap flex items-center justify-center"
+            className="h-14 rounded-2xl bg-card text-[20px] font-medium tap flex items-center justify-center shadow-[var(--shadow-card)] dark:ring-1 dark:ring-[var(--line)]"
           >
-            {k === 'back' ? <Delete size={20} /> : k}
+            {k === 'back' ? <Delete size={18} strokeWidth={1.75} /> : k}
           </button>
         ))}
       </div>
 
       <Button
+        variant="brand"
         size="lg"
         className="mt-4"
         onClick={calc}
         disabled={value <= 0 || !!verdict}
       >
-        <Sparkles size={18} />
+        <Sparkles size={16} strokeWidth={1.75} />
         Check it
       </Button>
 
-      {/* Verdict bottom sheet */}
       <AnimatePresence>
         {verdict && verdictStyles && (
           <>
@@ -194,36 +211,47 @@ export function AffordCheck() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={reset}
-              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px]"
+              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
             />
             <motion.div
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-              className="fixed bottom-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-[420px] bg-card rounded-t-3xl border border-line p-5 pb-[max(env(safe-area-inset-bottom),1.25rem)] shadow-[var(--shadow-lift)]"
+              className="fixed bottom-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-[420px] bg-card rounded-t-3xl p-5 pb-[max(env(safe-area-inset-bottom),1.25rem)] shadow-[var(--shadow-lift)]"
             >
-              <div className="flex justify-center -mt-2 mb-2">
+              <div className="flex justify-center -mt-2 mb-3">
                 <div className="h-1 w-10 rounded-full bg-[var(--line)]" />
               </div>
-              <div
-                className={cn(
-                  'rounded-2xl p-5 text-center',
-                  verdictStyles.bg,
-                )}
-              >
-                <div className="text-3xl mb-1">{verdictStyles.emoji}</div>
-                <div className={cn('text-xl font-semibold', verdictStyles.text)}>
+              <div className={cn('rounded-2xl p-6 text-center', verdictStyles.bg)}>
+                <div
+                  className={cn(
+                    'h-12 w-12 rounded-full bg-white/60 dark:bg-black/20 flex items-center justify-center mx-auto mb-3',
+                    verdictStyles.text,
+                  )}
+                >
+                  <verdictStyles.Icon size={22} strokeWidth={2} />
+                </div>
+                <div
+                  className={cn(
+                    'text-[20px] font-semibold tracking-tight',
+                    verdictStyles.text,
+                  )}
+                >
                   {verdict.headline}
                 </div>
-                <div className={cn('text-sm mt-2 leading-relaxed', verdictStyles.text, 'opacity-90')}>
+                <div
+                  className={cn(
+                    'text-[13px] mt-2 leading-relaxed',
+                    verdictStyles.text,
+                    'opacity-90',
+                  )}
+                >
                   {verdict.detail}
                 </div>
               </div>
 
-              {verdict.tradeoffs.length > 0 && (
-                <Tradeoffs items={verdict.tradeoffs} />
-              )}
+              {verdict.tradeoffs.length > 0 && <Tradeoffs items={verdict.tradeoffs} />}
 
               <div className="grid grid-cols-2 gap-2 mt-4">
                 <Button variant="secondary" size="md" onClick={reset}>
@@ -265,9 +293,10 @@ function Tradeoffs({ items }: { items: { categoryName: string; cut: number }[] }
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between px-4 py-3 tap"
       >
-        <span className="text-sm font-medium">How to make it work</span>
+        <span className="text-[13px] font-semibold">How to make it work</span>
         <ChevronDown
-          size={18}
+          size={16}
+          strokeWidth={1.75}
           className={cn('transition-transform text-soft', open && 'rotate-180')}
         />
       </button>
@@ -283,7 +312,7 @@ function Tradeoffs({ items }: { items: { categoryName: string; cut: number }[] }
               {items.map((t) => (
                 <li
                   key={t.categoryName}
-                  className="flex items-center justify-between text-sm"
+                  className="flex items-center justify-between text-[13px]"
                 >
                   <span className="text-soft">Cut from {t.categoryName}</span>
                   <span className="num font-semibold">−${t.cut}</span>

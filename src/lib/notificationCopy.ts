@@ -18,7 +18,7 @@ export const COPY: Record<NotificationType, Record<Voice, Template[]>> = {
       { title: 'Still on track', body: '{amount} at {merchant}. Solid — well inside {category}.' },
     ],
     playful: [
-      { title: 'Logged ✓', body: '{amount} at {merchant}. {category} has {remaining} left to play with.' },
+      { title: 'Logged', body: '{amount} at {merchant}. {category} has {remaining} left to play with.' },
       { title: 'Noted', body: '{amount} at {merchant}. {category} budget is living its best life.' },
     ],
   },
@@ -32,7 +32,7 @@ export const COPY: Record<NotificationType, Record<Voice, Template[]>> = {
       { title: 'FYI', body: "You're at {pct}% on {category}. Not over, just a check-in." },
     ],
     playful: [
-      { title: 'Worth a glance', body: '{category} tipped past {pct}% with that {amount} 👀' },
+      { title: 'Worth a glance', body: '{category} tipped past {pct}% with that {amount}.' },
       { title: 'Eye on it', body: '{category} vibing at {pct}%. Some runway — not endless.' },
     ],
   },
@@ -46,7 +46,7 @@ export const COPY: Record<NotificationType, Record<Voice, Template[]>> = {
       { title: 'Heads up', body: '{category} just hit its limit. Your call from here.' },
     ],
     playful: [
-      { title: 'Cutting it close', body: '{category} is {pct}% full. {remaining} to last {days_left} days 😬' },
+      { title: 'Cutting it close', body: '{category} is {pct}% full. {remaining} to last {days_left} days.' },
       { title: 'Tapped', body: '{category} budget: maxed. Anything more eats into another category.' },
     ],
   },
@@ -60,7 +60,7 @@ export const COPY: Record<NotificationType, Record<Voice, Template[]>> = {
       { title: 'Crossed the line', body: '{category} just went {over} over. Want to shift things around?' },
     ],
     playful: [
-      { title: 'Welp', body: "{category} is {over} over. We've got options though 👀" },
+      { title: 'Welp', body: "{category} is {over} over. We've got options though." },
       { title: 'Past it', body: '{category} budget tapped out — {over} over. Tap to fix it.' },
     ],
   },
@@ -75,7 +75,7 @@ export const COPY: Record<NotificationType, Record<Voice, Template[]>> = {
     ],
     playful: [
       { title: 'Speedrun', body: '{category} speedrun continues — {count} in 48 hrs, {total} deep.' },
-      { title: 'Big fan moment', body: "{category}'s biggest fan: {count} purchases, {total}. Just noting it." },
+      { title: 'Frequent flyer', body: "{category}'s biggest fan: {count} purchases, {total}. Just noting it." },
     ],
   },
   trend: {
@@ -88,8 +88,8 @@ export const COPY: Record<NotificationType, Record<Voice, Template[]>> = {
       { title: 'FYI', body: '{category} is running higher than usual this week. Worth knowing.' },
     ],
     playful: [
-      { title: 'Moment alert', body: '{category} having a *moment* this week — {delta_pct}% above usual.' },
-      { title: 'Line goes up', body: '{category} chart: up and to the right 📈 ({delta_pct}% above normal)' },
+      { title: 'Moment alert', body: '{category} having a moment this week — {delta_pct}% above usual.' },
+      { title: 'Line goes up', body: '{category} chart: up and to the right. {delta_pct}% above normal.' },
     ],
   },
   positive: {
@@ -102,8 +102,8 @@ export const COPY: Record<NotificationType, Record<Voice, Template[]>> = {
       { title: 'Solid month', body: 'Solid month so far — {remaining} under pace overall.' },
     ],
     playful: [
-      { title: 'Behaving', body: '{category} is *behaving* this month. Currently {remaining} under pace 🎯' },
-      { title: 'Looking clean', body: "This month's looking clean — {remaining} under and you're not even trying 🧹" },
+      { title: 'Behaving', body: '{category} is behaving this month. Currently {remaining} under pace.' },
+      { title: 'Looking clean', body: "This month's looking clean — {remaining} under and you're not even trying." },
     ],
   },
   no_spend: {
@@ -113,11 +113,11 @@ export const COPY: Record<NotificationType, Record<Voice, Template[]>> = {
     ],
     encouraging: [
       { title: 'Nice rhythm', body: '{streak}-day {category} streak going. Quietly winning.' },
-      { title: 'Best run', body: 'No {category} for {streak} days. That\'s your best run this month.' },
+      { title: 'Best run', body: "No {category} for {streak} days. That's your best run this month." },
     ],
     playful: [
-      { title: 'Streak 🔥', body: "{streak} days {category}-free and the world hasn't ended." },
-      { title: 'Who are you', body: '{streak} days, zero {category}. Who is this 👀' },
+      { title: 'Streak', body: "{streak} days {category}-free and the world hasn't ended." },
+      { title: 'Who are you', body: '{streak} days, zero {category}. Who is this?' },
     ],
   },
   impulse: {
@@ -130,7 +130,7 @@ export const COPY: Record<NotificationType, Record<Voice, Template[]>> = {
       { title: 'Quick check', body: 'Bigger purchase than usual ({amount}). All good — just a flag.' },
     ],
     playful: [
-      { title: 'A moment', body: '{amount} is a *moment*, not a typical {category} run for you 👀' },
+      { title: 'A moment', body: '{amount} is a moment, not a typical {category} run for you.' },
       { title: 'Big spender', body: '{amount} at {merchant} — bigger than your usual. Just noting it.' },
     ],
   },
@@ -144,7 +144,7 @@ export const COPY: Record<NotificationType, Record<Voice, Template[]>> = {
       { title: 'Week wrapped', body: '{week_total} spent, {week_delta} less than last week. That counts.' },
     ],
     playful: [
-      { title: 'Your week 📊', body: '{week_total} out the door. Food won (again) 🍔' },
+      { title: 'Your week', body: '{week_total} out the door. Food won again.' },
       { title: 'Week wrapped', body: '{week_total} spent, {week_delta} less than last week. Quietly winning.' },
     ],
   },
@@ -158,8 +158,8 @@ export const COPY: Record<NotificationType, Record<Voice, Template[]>> = {
       { title: 'Clean slate', body: 'New month, clean slate. {budget} ready to be put to work.' },
     ],
     playful: [
-      { title: 'New month 🎯', body: "{budget} in the chamber. Let's go." },
-      { title: 'New month ✨', body: "It's the 1st. Budget got a haircut and a refresh." },
+      { title: 'New month', body: "{budget} in the chamber. Let's go." },
+      { title: 'New month', body: "It's the 1st. Budget got a haircut and a refresh." },
     ],
   },
   savings_milestone: {
@@ -172,8 +172,8 @@ export const COPY: Record<NotificationType, Record<Voice, Template[]>> = {
       { title: 'Closer', body: '{goal_name} is {goal_pct}% real. {goal_remaining} to make it official.' },
     ],
     playful: [
-      { title: 'Closer 🌴', body: '{goal_name}: {goal_pct}% there. Closer than yesterday.' },
-      { title: 'Unlocked 🎉', body: '{goal_name} is {goal_pct}% funded — {goal_remaining} to the finish line.' },
+      { title: 'Closer', body: '{goal_name}: {goal_pct}% there. Closer than yesterday.' },
+      { title: 'Unlocked', body: '{goal_name} is {goal_pct}% funded — {goal_remaining} to the finish line.' },
     ],
   },
 }
@@ -229,7 +229,11 @@ interface Context {
 
 const fmtMoney = (n: number) => {
   const abs = Math.abs(n)
-  const formatted = abs % 1 === 0 ? abs.toFixed(0) : abs.toFixed(2)
+  const showCents = abs % 1 !== 0
+  const formatted = abs.toLocaleString('en-US', {
+    minimumFractionDigits: showCents ? 2 : 0,
+    maximumFractionDigits: showCents ? 2 : 0,
+  })
   return `$${formatted}`
 }
 

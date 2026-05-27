@@ -6,7 +6,7 @@ export const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
     <div
       ref={ref}
       className={cn(
-        'bg-card border border-line rounded-2xl p-5 shadow-[var(--shadow-card)]',
+        'bg-card rounded-[20px] p-5 shadow-[var(--shadow-card)] dark:ring-1 dark:ring-[var(--line)]',
         className,
       )}
       {...props}
@@ -26,7 +26,9 @@ export function CardHeader({
 }) {
   return (
     <div className={cn('flex items-center justify-between mb-3', className)}>
-      <h3 className="text-[15px] font-semibold text-ink">{title}</h3>
+      <h3 className="text-[14px] font-semibold text-ink tracking-tight">
+        {title}
+      </h3>
       {action}
     </div>
   )
