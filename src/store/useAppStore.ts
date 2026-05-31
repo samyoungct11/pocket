@@ -88,7 +88,7 @@ export interface PlaidTransaction {
   amount: number        // positive = money out (Plaid convention)
   date: string          // 'YYYY-MM-DD'
   merchant: string
-  category: string      // already mapped to Pocket category name
+  category: string      // already mapped to Curb category name
   raw_category: string
 }
 

@@ -21,7 +21,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
 )
 
-// Map Plaid's personal_finance_category primary values → Pocket category names
+// Map Plaid's personal_finance_category primary values → Curb category names
 const CATEGORY_MAP: Record<string, string> = {
   FOOD_AND_DRINK: 'Restaurants',
   TRANSPORTATION: 'Transport',

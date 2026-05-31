@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#16965A"/>
+  <!-- App-icon tile: brand green squircle -->
+  <rect width="512" height="512" rx="112" fill="#16965A"/>
   <!-- "C" as an open ring — echoes the app's spending ring; the gap = headroom left -->
   <path d="M 356 145 A 150 150 0 1 0 356 367"
         fill="none" stroke="#FFFFFF" stroke-width="66" stroke-linecap="round"/>

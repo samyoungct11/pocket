@@ -54,7 +54,7 @@ export function buildWelcomeNotification(totalBudget: number): NotificationItem 
   return {
     id: uid(),
     type: 'monthly_reset',
-    title: 'Welcome to Pocket',
+    title: 'Welcome to Curb',
     body: `$${totalBudget} budgeted across your categories. Tap + on Activity to log your first spend.`,
     read: false,
     createdAt: new Date().toISOString(),

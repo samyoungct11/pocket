@@ -24,7 +24,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const response = await plaid.linkTokenCreate({
       user: { client_user_id: userId },
-      client_name: 'Pocket',
+      client_name: 'Curb',
       products: [Products.Transactions],
       country_codes: [CountryCode.Us],
       language: 'en',

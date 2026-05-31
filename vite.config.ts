@@ -12,8 +12,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'pwa-icon.svg'],
       manifest: {
-        name: 'Pocket — Your money, in real time',
-        short_name: 'Pocket',
+        name: 'Curb — Your money, in real time',
+        short_name: 'Curb',
         description:
           'Real-time spending awareness for ages 12–25. Know what you spent, the second you spend it.',
         theme_color: '#16965A',
